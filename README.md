@@ -47,33 +47,33 @@ git checkout -b ten-branch-cua-ban
 git checkout -b thanhdong
 ```
 
-### Pull Code Mới Nhất Từ Master
+### Pull Code Mới Nhất Từ main
 
-Để cập nhật code mới nhất từ branch master:
+Để cập nhật code mới nhất từ branch main:
 
 ```bash
-# Đảm bảo bạn đang ở branch master
-git checkout master
+# Đảm bảo bạn đang ở branch main
+git checkout main
 
 # Pull code mới nhất
-git pull origin master
+git pull origin main
 ```
 
-**Cập nhật branch hiện tại với code mới từ master:**
+**Cập nhật branch hiện tại với code mới từ main:**
 
 ```bash
 # Đang ở branch của bạn
 git checkout ten-branch-cua-ban
 
-# Merge code mới từ master vào branch hiện tại
-git merge master
+# Merge code mới từ main vào branch hiện tại
+git merge main
 
 ### Workflow Cơ Bản
 
 1. **Pull code mới nhất:**
    ```bash
-   git checkout master
-   git pull origin master
+   git checkout main
+   git pull origin main
    ```
 
 2. **Tạo branch mới:**
@@ -92,7 +92,7 @@ git merge master
    git push origin ten-branch-cua-ban
    ```
 
-5. **Tạo Pull Request trên GitHub/GitLab để merge vào master**
+5. **Tạo Pull Request trên GitHub/GitLab để merge vào main**
 
 ## 3. Tech Stack
 
