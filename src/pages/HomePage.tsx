@@ -1,30 +1,21 @@
-import { Link } from "react-router-dom"
-
-import { Button } from "@/components/ui/button"
+import { BrandStrip } from "@/components/home/brand-strip"
+import { Hero } from "@/components/home/hero"
+import { NewsletterCta } from "@/components/home/newsletter-cta"
+import { ProductSection } from "@/components/home/product-section"
+import { StyleBrowser } from "@/components/home/style-browser"
+import { TestimonialSection } from "@/components/home/testimonial-section"
+import { NEW_ARRIVALS, TOP_SELLING } from "@/data/homepage"
 
 function HomePage() {
   return (
-    <div className="space-y-6 text-center">
-      <div className="space-y-2">
-        <p className="text-sm font-semibold uppercase text-slate-500">
-          Sales PM
-        </p>
-        <h1 className="text-balance text-4xl font-bold text-slate-900">
-          Close more deals with less busywork
-        </h1>
-        <p className="text-pretty text-base text-slate-600">
-          Stay on top of every relationship, automate reminders, and keep your
-          pipeline accurate without touching a spreadsheet.
-        </p>
-      </div>
-      <div className="flex flex-wrap items-center justify-center gap-3">
-        <Button asChild>
-          <Link to="/pipeline">Get started</Link>
-        </Button>
-        <Button variant="outline" asChild>
-          <Link to="/reports">View reports</Link>
-        </Button>
-      </div>
+    <div className="space-y-0">
+      <Hero />
+      <BrandStrip />
+      <ProductSection products={NEW_ARRIVALS} title="New Arrivals" />
+      <ProductSection products={TOP_SELLING} title="Top Selling" />
+      <StyleBrowser />
+      <TestimonialSection />
+      <NewsletterCta />
     </div>
   )
 }
