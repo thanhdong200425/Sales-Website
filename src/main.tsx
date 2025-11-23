@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom"
 
 import App from "./App.tsx"
 import "./index.css"
+import CartPage from "./pages/CartPage.tsx"
 import HomePage from "./pages/HomePage.tsx"
 import NotFoundPage from "./pages/NotFoundPage.tsx"
 import PipelinePage from "./pages/PipelinePage.tsx"
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
       {
         path: "reports",
         element: <ReportsPage />,
+      },
+      {
+        path: "cart",
+        element: <CartPage />,
       },
     ],
     errorElement: <NotFoundPage />,
