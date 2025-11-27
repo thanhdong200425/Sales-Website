@@ -10,6 +10,7 @@ import NotFoundPage from "./pages/NotFoundPage.tsx"
 import PipelinePage from "./pages/PipelinePage.tsx"
 import ReportsPage from "./pages/ReportsPage.tsx"
 import ProductListPage from "./pages/ProductListPage.tsx"
+import ProductDetailPage from "./pages/DetailPage.tsx"
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
         path: "cart",
         element: <CartPage />,
       },
+      {
+        path: "product/:slug",
+        element: <ProductDetailPage/>
+      }
     ],
     errorElement: <NotFoundPage />,
   },

@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 
 export interface ProductImage {
@@ -65,7 +65,7 @@ export async function fetchProducts(filters: ProductFilters = {}): Promise<ApiPr
 
     return await response.json();
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error('Error fetching products:', error);
     throw error;
   }
 }
@@ -78,7 +78,7 @@ export async function fetchFeaturedProducts(): Promise<ApiProduct[]> {
     }
     return await response.json();
   } catch (error) {
-    console.error("Error fetching featured products:", error);
+    console.error('Error fetching featured products:', error);
     throw error;
   }
 }

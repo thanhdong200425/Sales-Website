@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { fetchProducts, type ApiProduct } from "@/services/api";
 
 function HomePage() {
+  
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +29,8 @@ function HomePage() {
           (product: ApiProduct) => ({
             id: product.id.toString(),
             name: product.name,
-            image: product.images?.[0]?.url || "https://via.placeholder.com/300",
+            slug: product.slug,
+            image: product.images[0]?.url || "https://via.placeholder.com/300",
             price: parseFloat(product.price),
             rating: 4.5,
           })
