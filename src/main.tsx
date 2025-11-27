@@ -9,6 +9,7 @@ import HomePage from "./pages/HomePage.tsx"
 import NotFoundPage from "./pages/NotFoundPage.tsx"
 import PipelinePage from "./pages/PipelinePage.tsx"
 import ReportsPage from "./pages/ReportsPage.tsx"
+import ProductListPage from "./pages/ProductListPage.tsx"
 import ProductDetailPage from "./pages/DetailPage.tsx"
 
 const router = createBrowserRouter([
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: "products", 
+        element: <ProductListPage />,
       },
       {
         path: "pipeline",

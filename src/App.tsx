@@ -11,7 +11,7 @@ function App() {
     <div className="flex min-h-svh flex-col bg-white text-slate-900">
       <AnnouncementBar />
       <SiteHeader />
-      <main>
+      <main className="flex-1">
         <Outlet />
       </main>
       <SiteFooter />

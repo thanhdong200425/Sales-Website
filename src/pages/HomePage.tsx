@@ -21,9 +21,10 @@ function HomePage() {
     async function loadProducts() {
       try {
         setLoading(true);
-        const apiProducts = await fetchProducts();
+        const response = await fetchProducts();
+        const apiProducts = response.data;
 
-        // Transform API products to match the Product interface
+        
         const transformedProducts: Product[] = apiProducts.map(
           (product: ApiProduct) => ({
             id: product.id.toString(),
@@ -31,7 +32,7 @@ function HomePage() {
             slug: product.slug,
             image: product.images[0]?.url || "https://via.placeholder.com/300",
             price: parseFloat(product.price),
-            rating: 4.5, // Default rating since it's not in the database
+            rating: 4.5,
           })
         );
 
@@ -40,7 +41,6 @@ function HomePage() {
       } catch (err) {
         console.error("Failed to load products:", err);
         setError("Failed to load products from the server");
-        // Fall back to static data
         setProducts([...NEW_ARRIVALS, ...TOP_SELLING]);
       } finally {
         setLoading(false);
@@ -49,8 +49,6 @@ function HomePage() {
 
     loadProducts();
   }, []);
-
-  // Split products into new arrivals (first 4) and top selling (next 4)
   const newArrivals = products.slice(0, 4);
   const topSelling = products.slice(4, 8);
 
