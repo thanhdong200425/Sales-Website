@@ -11,6 +11,7 @@ import PipelinePage from "./pages/PipelinePage.tsx"
 import ReportsPage from "./pages/ReportsPage.tsx"
 import ProductListPage from "./pages/ProductListPage.tsx"
 import ProductDetailPage from "./pages/DetailPage.tsx"
+import { WishlistPage } from './pages/WishlistPage'
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,11 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: "products", 
+        path: "/wishlist",
+        element: <WishlistPage />, 
+      },
+      {
+        path: "products",
         element: <ProductListPage />,
       },
       {
@@ -39,7 +44,7 @@ const router = createBrowserRouter([
       },
       {
         path: "product/:slug",
-        element: <ProductDetailPage/>
+        element: <ProductDetailPage />
       }
     ],
     errorElement: <NotFoundPage />,
