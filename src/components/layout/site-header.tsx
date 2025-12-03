@@ -1,10 +1,16 @@
-import { Search, ShoppingBag, UserRound } from "lucide-react";
+import { Search, ShoppingBag, UserRound, User, Package } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const NAV_LINKS = [
   { label: "Shop", to: "/products", isDropdown: true },
@@ -14,17 +20,16 @@ const NAV_LINKS = [
 ];
 
 const SHOP_STYLES = [
-  { name: 'Casual', param: 'Casual' },
-  { name: 'Formal', param: 'Formal' },
-  { name: 'Party', param: 'Party' },
-  { name: 'Gym', param: 'Gym' },
+  { name: "Casual", param: "Casual" },
+  { name: "Formal", param: "Formal" },
+  { name: "Party", param: "Party" },
+  { name: "Gym", param: "Gym" },
 ];
 
 function SiteHeader() {
-const [isShopMenuOpen, setIsShopMenuOpen] = useState(false);
+  const [isShopMenuOpen, setIsShopMenuOpen] = useState(false);
   // const dropdownRef = useRef<HTMLDivElement>(null);
 
-  
   // const handleShopClick = () => {
   //   setIsShopMenuOpen(prev => !prev);
   // };
@@ -41,75 +46,74 @@ const [isShopMenuOpen, setIsShopMenuOpen] = useState(false);
 
         <nav className="flex flex-1 flex-wrap items-center justify-center gap-4 text-sm text-slate-600">
           {NAV_LINKS.map((item) => {
-            
-    if (item.isDropdown) {
-      return (
-        <div 
-          key={item.label} 
-          
-          className="group relative h-full flex items-center px-2" 
-          onMouseEnter={() => setIsShopMenuOpen(true)}
-          onMouseLeave={() => setIsShopMenuOpen(false)}
-        >
-          <Link 
-            to={item.to}
-            className={`font-medium transition hover:text-slate-900 flex items-center h-full cursor-pointer ${isShopMenuOpen ? 'text-slate-900' : ''}`}
-            onClick={() => setIsShopMenuOpen(false)} 
-          >
-            {item.label}
-          </Link>
-          
-          {/* Menu Dropdown */}
-          <div 
-            className={`absolute left-1/2 top-[100%] z-50 w-48 -translate-x-1/2 rounded-b-md border border-t-0 border-slate-100 bg-white p-2 shadow-xl transition-all duration-200 ${
-              isShopMenuOpen 
-                ? 'visible opacity-100 translate-y-0' 
-                : 'invisible opacity-0 -translate-y-2' 
-            }`}
-          >
-            
-            <div className="absolute -top-2 left-1/2 -translate-x-1/2 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white"></div>
+            if (item.isDropdown) {
+              return (
+                <div
+                  key={item.label}
+                  className="group relative h-full flex items-center px-2"
+                  onMouseEnter={() => setIsShopMenuOpen(true)}
+                  onMouseLeave={() => setIsShopMenuOpen(false)}
+                >
+                  <Link
+                    to={item.to}
+                    className={`font-medium transition hover:text-slate-900 flex items-center h-full cursor-pointer ${
+                      isShopMenuOpen ? "text-slate-900" : ""
+                    }`}
+                    onClick={() => setIsShopMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
 
-            <Link
-              to="/products"
-              onClick={() => setIsShopMenuOpen(false)}
-              className="block rounded-md px-4 py-2 text-sm font-bold text-slate-900 hover:bg-slate-50"
-            >
-              View All
-            </Link>
+                  {/* Menu Dropdown */}
+                  <div
+                    className={`absolute left-1/2 top-full z-50 w-48 -translate-x-1/2 rounded-b-md border border-t-0 border-slate-100 bg-white p-2 shadow-xl transition-all duration-200 ${
+                      isShopMenuOpen
+                        ? "visible opacity-100 translate-y-0"
+                        : "invisible opacity-0 -translate-y-2"
+                    }`}
+                  >
+                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white"></div>
 
-            <div className="my-1 border-t border-slate-100"></div>
+                    <Link
+                      to="/products"
+                      onClick={() => setIsShopMenuOpen(false)}
+                      className="block rounded-md px-4 py-2 text-sm font-bold text-slate-900 hover:bg-slate-50"
+                    >
+                      View All
+                    </Link>
 
-            {SHOP_STYLES.map((style) => (
-              <Link
-                key={style.param}
-                to={`/products?style=${style.param}`} 
-                onClick={() => setIsShopMenuOpen(false)}
-                className="block rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600"
+                    <div className="my-1 border-t border-slate-100"></div>
+
+                    {SHOP_STYLES.map((style) => (
+                      <Link
+                        key={style.param}
+                        to={`/products?style=${style.param}`}
+                        onClick={() => setIsShopMenuOpen(false)}
+                        className="block rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600"
+                      >
+                        {style.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <NavLink
+                key={item.label}
+                to={item.to}
+                className={({ isActive }) =>
+                  `font-medium transition hover:text-slate-900 ${
+                    isActive ? "text-slate-900" : ""
+                  }`
+                }
               >
-                {style.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <NavLink
-        key={item.label}
-        to={item.to}
-        className={({ isActive }) =>
-          `font-medium transition hover:text-slate-900 ${
-            isActive ? "text-slate-900" : ""
-          }`
-        }
-      >
-        {item.label}
-      </NavLink>
-    );
-  })}
-</nav>
+                {item.label}
+              </NavLink>
+            );
+          })}
+        </nav>
 
         <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center lg:w-auto lg:flex-1 lg:justify-end">
           <div className="flex flex-1 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2">
@@ -120,13 +124,37 @@ const [isShopMenuOpen, setIsShopMenuOpen] = useState(false);
             />
           </div>
           <div className="flex items-center gap-3">
-            <Button
-              size="icon"
-              variant="ghost"
-              className="rounded-full border border-slate-200"
-            >
-              <UserRound className="size-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="rounded-full border border-slate-200"
+                >
+                  <UserRound className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <User className="size-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/order-status"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <Package className="size-4" />
+                    <span>Order Status</span>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <NavLink to="/cart">
               <Button
                 size="icon"
