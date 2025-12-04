@@ -1,26 +1,28 @@
-import { Link } from "react-router-dom"
-import { useState } from "react"
+import { Link } from "react-router-dom";
 
-import { CartItemComponent } from "@/components/cart/cart-item"
-import { OrderSummary } from "@/components/cart/order-summary"
-import { NewsletterCta } from "@/components/home/newsletter-cta"
-import { MOCK_CART_ITEMS, type CartItem } from "@/data/cart"
+import { CartItemComponent } from "@/components/cart/cart-item";
+import { OrderSummary } from "@/components/cart/order-summary";
+import { NewsletterCta } from "@/components/home/newsletter-cta";
+import { useCart } from "@/contexts/CartContext";
 
 function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>(MOCK_CART_ITEMS)
+  const { cartItems, updateQuantity, removeFromCart } = useCart();
 
   const handleQuantityChange = (id: string, quantity: number) => {
-    setCartItems((items) => items.map((item) => (item.id === id ? { ...item, quantity } : item)))
-  }
+    updateQuantity(id, quantity);
+  };
 
   const handleRemove = (id: string) => {
-    setCartItems((items) => items.filter((item) => item.id !== id))
-  }
+    removeFromCart(id);
+  };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const discount = Math.round(subtotal * 0.2)
-  const deliveryFee = 15
-  const total = subtotal - discount + deliveryFee
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  const discount = Math.round(subtotal * 0.2);
+  const deliveryFee = 15;
+  const total = subtotal - discount + deliveryFee;
 
   return (
     <div className="space-y-0">
@@ -45,8 +47,13 @@ function CartPage() {
 
         {cartItems.length === 0 ? (
           <div className="py-12 text-center sm:py-16">
-            <p className="text-base text-slate-600 sm:text-lg">Your cart is empty</p>
-            <Link to="/" className="mt-4 inline-block text-slate-900 underline hover:text-slate-700">
+            <p className="text-base text-slate-600 sm:text-lg">
+              Your cart is empty
+            </p>
+            <Link
+              to="/"
+              className="mt-4 inline-block text-slate-900 underline hover:text-slate-700"
+            >
               Continue shopping
             </Link>
           </div>
@@ -66,7 +73,12 @@ function CartPage() {
 
             {/* Order Summary */}
             <div>
-              <OrderSummary subtotal={subtotal} discount={discount} deliveryFee={deliveryFee} total={total} />
+              <OrderSummary
+                subtotal={subtotal}
+                discount={discount}
+                deliveryFee={deliveryFee}
+                total={total}
+              />
             </div>
           </div>
         )}
@@ -77,8 +89,7 @@ function CartPage() {
         <NewsletterCta />
       </div>
     </div>
-  )
+  );
 }
 
-export default CartPage
-
+export default CartPage;
