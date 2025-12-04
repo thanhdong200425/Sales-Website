@@ -1,7 +1,7 @@
 import { Search, ShoppingBag, UserRound, User, Package, Heart, Menu, X, ChevronDown } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,28 +30,48 @@ function SiteHeader() {
   const [isShopMenuOpen, setIsShopMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [wishlistPulseKey, setWishlistPulseKey] = useState(0);
+  const [showWishlistPulse, setShowWishlistPulse] = useState(false);
   const navigate = useNavigate();
 
-  
+  useEffect(() => {
+    const handleWishlistPulse = () => {
+      setWishlistPulseKey((prev) => prev + 1);
+    };
+
+    window.addEventListener("wishlist:pulse", handleWishlistPulse);
+    return () => {
+      window.removeEventListener("wishlist:pulse", handleWishlistPulse);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (wishlistPulseKey === 0) return;
+    setShowWishlistPulse(true);
+    const timeout = setTimeout(() => setShowWishlistPulse(false), 800);
+    return () => clearTimeout(timeout);
+  }, [wishlistPulseKey]);
+
+
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const query = formData.get("q");
     if (query) {
       navigate(`/products?search=${query}`);
-      setIsMobileSearchOpen(false); 
+      setIsMobileSearchOpen(false);
     }
   };
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white shadow-sm">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 md:px-6">
-        
+
         {/* MOBILE MENU TRIGGER & LOGO */}
         <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className="lg:hidden -ml-2"
             onClick={() => setIsMobileMenuOpen(true)}
           >
@@ -146,7 +166,7 @@ function SiteHeader() {
               autoComplete="off"
             />
           </form>
-          
+
           <div className="flex items-center gap-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -180,9 +200,21 @@ function SiteHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
             <Link to="/wishlist">
-              <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-100" title="Wishlist">
-                <Heart className="h-5 w-5" />
-              </Button>
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full hover:bg-slate-100"
+                  title="Wishlist"
+                >
+                  <Heart className="h-5 w-5" />
+                </Button>
+                {showWishlistPulse && (
+                  <span className="pointer-events-none absolute -right-1 -top-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-semibold text-white shadow-sm animate-bounce">
+                    +1
+                  </span>
+                )}
+              </div>
             </Link>
             <NavLink to="/cart">
               <Button
@@ -212,11 +244,11 @@ function SiteHeader() {
       )}
     {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex lg:hidden">
-            <div 
-                className="fixed inset-0 bg-black/20 backdrop-blur-sm" 
+            <div
+                className="fixed inset-0 bg-black/20 backdrop-blur-sm"
                 onClick={() => setIsMobileMenuOpen(false)}
             ></div>
-            
+
             <div className="relative w-full max-w-xs bg-white p-6 shadow-xl animate-in slide-in-from-left duration-300">
                 <div className="flex items-center justify-between mb-8">
                     <span className="text-xl font-bold">Menu</span>
@@ -224,7 +256,7 @@ function SiteHeader() {
                         <X className="h-6 w-6" />
                     </Button>
                 </div>
-                
+
                 <nav className="flex flex-col gap-6">
                     {NAV_LINKS.map((item) => (
                         <Link
@@ -236,9 +268,9 @@ function SiteHeader() {
                             {item.label}
                         </Link>
                     ))}
-                    
+
                     <div className="my-2 h-px bg-slate-100"></div>
-                    
+
                     <Link to="/cart" className="flex items-center gap-2 font-medium" onClick={() => setIsMobileMenuOpen(false)}>
                         <ShoppingBag className="h-5 w-5" /> Cart
                     </Link>
