@@ -52,11 +52,11 @@ export interface ProductFilters {
   page?: number;
 }
 
-export async function fetchProducts(filters: ProductFilters = {}): Promise<ApiProduct[]> {
+export async function fetchProducts(filters: ProductFilters = {}): Promise<ProductsResponse[]> {
   try {
     
     const params = new URLSearchParams(filters as Record<string, string>).toString();
-    const url = `${API_BASE_URL}/api/products${params ? `?${params}` : ''}`;
+    const url = `${API_BASE_URL}/api/items${params ? `?${params}` : ''}`;
 
     const response = await fetch(url);
     if (!response.ok) {
@@ -72,7 +72,7 @@ export async function fetchProducts(filters: ProductFilters = {}): Promise<ApiPr
 
 export async function fetchFeaturedProducts(): Promise<ApiProduct[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/products/featured`);
+    const response = await fetch(`${API_BASE_URL}/api/items/featured`);
     if (!response.ok) {
       throw new Error(`Failed to fetch featured products: ${response.statusText}`);
     }

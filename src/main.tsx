@@ -12,6 +12,7 @@ import ReportsPage from "./pages/ReportsPage.tsx";
 import ProductListPage from "./pages/ProductListPage.tsx";
 import ProductDetailPage from "./pages/DetailPage.tsx";
 import OrderStatusPage from "./pages/OrderStatusPage.tsx";
+import WishlistPage from "./pages/WishlistPage.tsx"
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: "/wishlist",
+        element: <WishlistPage />, 
       },
       {
         path: "products",

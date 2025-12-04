@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom'; // Thêm Link
+import { useSearchParams, Link } from 'react-router-dom'; 
 import { ChevronRight, ArrowLeft, ArrowRight } from 'lucide-react'; 
 
 import { fetchProducts, type ApiProduct, type ProductFilters } from "@/services/api"; 
 import { type Product } from "@/components/home/product-section";
-import { ProductCard } from "./ProductCard";
+import  ProductCard  from "./ProductCard";
 import ProductFilterSidebar from "@/components/shop/ProductFilterSidebar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -22,7 +22,6 @@ function ProductListPage() {
     });
 
     const [searchParams, setSearchParams] = useSearchParams(); 
-    // const currentFilters = Object.fromEntries(searchParams.entries()) as unknown as ProductFilters;
     const currentStyle = searchParams.get('style');
     
     // Name Breadcrumbs and title
