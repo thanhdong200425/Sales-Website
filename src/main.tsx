@@ -1,17 +1,18 @@
-import { StrictMode } from "react"
-import { createRoot } from "react-dom/client"
-import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import App from "./App.tsx"
-import "./index.css"
-import CartPage from "./pages/CartPage.tsx"
-import HomePage from "./pages/HomePage.tsx"
-import NotFoundPage from "./pages/NotFoundPage.tsx"
-import PipelinePage from "./pages/PipelinePage.tsx"
-import ReportsPage from "./pages/ReportsPage.tsx"
-import ProductListPage from "./pages/ProductListPage.tsx"
-import ProductDetailPage from "./pages/DetailPage.tsx"
-import { WishlistPage } from './pages/WishlistPage'
+import App from "./App.tsx";
+import "./index.css";
+import CartPage from "./pages/CartPage.tsx";
+import HomePage from "./pages/HomePage.tsx";
+import NotFoundPage from "./pages/NotFoundPage.tsx";
+import PipelinePage from "./pages/PipelinePage.tsx";
+import ReportsPage from "./pages/ReportsPage.tsx";
+import ProductListPage from "./pages/ProductListPage.tsx";
+import ProductDetailPage from "./pages/DetailPage.tsx";
+import OrderStatusPage from "./pages/OrderStatusPage.tsx";
+import WishlistPage from "./pages/WishlistPage.tsx"
 
 const router = createBrowserRouter([
   {
@@ -44,8 +45,12 @@ const router = createBrowserRouter([
       },
       {
         path: "product/:slug",
-        element: <ProductDetailPage />
-      }
+        element: <ProductDetailPage />,
+      },
+      {
+        path: "order-status",
+        element: <OrderStatusPage />,
+      },
     ],
     errorElement: <NotFoundPage />,
   },
@@ -53,10 +58,10 @@ const router = createBrowserRouter([
     path: "*",
     element: <NotFoundPage />,
   },
-])
+]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RouterProvider router={router} />
-  </StrictMode>,
-)
+  </StrictMode>
+);

@@ -1,8 +1,16 @@
-import { Search, ShoppingBag, UserRound, Heart, Menu, X, ChevronDown } from "lucide-react";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { Search, ShoppingBag, UserRound, User, Package, Heart, Menu, X, ChevronDown } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const NAV_LINKS = [
   { label: "Shop", to: "/products", isDropdown: true },
@@ -12,10 +20,10 @@ const NAV_LINKS = [
 ];
 
 const SHOP_STYLES = [
-  { name: 'Casual', param: 'casual' },
-  { name: 'Formal', param: 'formal' },
-  { name: 'Party', param: 'party' },
-  { name: 'Gym', param: 'gym' },
+  { name: "Casual", param: "Casual" },
+  { name: "Formal", param: "Formal" },
+  { name: "Party", param: "Party" },
+  { name: "Gym", param: "Gym" },
 ];
 
 function SiteHeader() {
@@ -36,7 +44,6 @@ function SiteHeader() {
   };
 
   return (
-    <>
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white shadow-sm">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 md:px-6">
         
@@ -63,41 +70,47 @@ function SiteHeader() {
               return (
                 <div
                   key={item.label}
-                  className="group relative h-full py-4"
+                  className="group relative h-full flex items-center px-2"
                   onMouseEnter={() => setIsShopMenuOpen(true)}
                   onMouseLeave={() => setIsShopMenuOpen(false)}
                 >
                   <Link
                     to={item.to}
-                    className={`flex items-center gap-1 transition hover:text-slate-900 ${isShopMenuOpen ? 'text-slate-900' : ''}`}
+                    className={`font-medium transition hover:text-slate-900 flex items-center h-full cursor-pointer ${
+                      isShopMenuOpen ? "text-slate-900" : ""
+                    }`}
                     onClick={() => setIsShopMenuOpen(false)}
                   >
                     {item.label}
                     <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isShopMenuOpen ? 'rotate-180' : ''}`} />
                   </Link>
 
-                  {/* Dropdown Menu */}
+                  {/* Menu Dropdown */}
                   <div
-                    className={`absolute left-0 top-full w-56 rounded-lg border border-slate-100 bg-white p-2 shadow-lg ring-1 ring-slate-900/5 transition-all duration-200 ${
+                    className={`absolute left-1/2 top-full z-50 w-48 -translate-x-1/2 rounded-b-md border border-t-0 border-slate-100 bg-white p-2 shadow-xl transition-all duration-200 ${
                       isShopMenuOpen
-                        ? 'visible opacity-100 translate-y-0'
-                        : 'invisible opacity-0 -translate-y-2 pointer-events-none'
+                        ? "visible opacity-100 translate-y-0"
+                        : "invisible opacity-0 -translate-y-2"
                     }`}
                   >
+                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white"></div>
+
                     <Link
                       to="/products"
                       onClick={() => setIsShopMenuOpen(false)}
-                      className="block rounded-md px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50 transition-colors"
+                      className="block rounded-md px-4 py-2 text-sm font-bold text-slate-900 hover:bg-slate-50"
                     >
-                      Browse All Products
+                      View All
                     </Link>
-                    <div className="my-1 h-px bg-slate-100" />
+
+                    <div className="my-1 border-t border-slate-100"></div>
+
                     {SHOP_STYLES.map((style) => (
                       <Link
                         key={style.param}
-                        to={`/products?category=${style.param}`}
+                        to={`/products?style=${style.param}`}
                         onClick={() => setIsShopMenuOpen(false)}
-                        className="block rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
+                        className="block rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600"
                       >
                         {style.name}
                       </Link>
@@ -106,12 +119,15 @@ function SiteHeader() {
                 </div>
               );
             }
+
             return (
               <NavLink
                 key={item.label}
                 to={item.to}
                 className={({ isActive }) =>
-                  `transition hover:text-slate-900 ${isActive ? "text-slate-900 font-semibold" : ""}`
+                  `font-medium transition hover:text-slate-900 ${
+                    isActive ? "text-slate-900" : ""
+                  }`
                 }
               >
                 {item.label}
@@ -120,10 +136,7 @@ function SiteHeader() {
           })}
         </nav>
 
-        {/* SEARCH BAR & ACTIONS */}
-        <div className="flex items-center gap-2 md:gap-4">
-          
-          {/* Desktop Search */}
+        <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center lg:w-auto lg:flex-1 lg:justify-end">
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-sm items-center gap-2 rounded-full bg-slate-100 px-4 py-2 transition-all focus-within:ring-2 focus-within:ring-slate-200 focus-within:bg-white">
             <Search className="h-4 w-4 text-slate-400" />
             <input
@@ -133,45 +146,60 @@ function SiteHeader() {
               autoComplete="off"
             />
           </form>
-
-          {/* Mobile Search Toggle */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="md:hidden"
-            onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-          >
-            <Search className="h-5 w-5" />
-          </Button>
-
-          {/* Icons Group */}
-          <div className="flex items-center gap-1 sm:gap-2">
-            
-            <Link to="/wishlist">
-                <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-100" title="Wishlist">
-                    <Heart className="h-5 w-5" />
+          
+          <div className="flex items-center gap-3">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="rounded-full border border-slate-200"
+                >
+                  <UserRound className="size-4" />
                 </Button>
-            </Link>
-
-            <Link to="/cart">
-              <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-100 relative" title="Cart">
-                <ShoppingBag className="h-5 w-5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <User className="size-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/order-status"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <Package className="size-4" />
+                    <span>Order Status</span>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Link to="/wishlist">
+              <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-100" title="Wishlist">
+                <Heart className="h-5 w-5" />
               </Button>
             </Link>
-
-            <Link to="/login">
-                <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-100" title="Account">
-                    <UserRound className="h-5 w-5" />
-                </Button>
-            </Link>
+            <NavLink to="/cart">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-full border border-slate-200"
+              >
+                <ShoppingBag className="size-4" />
+              </Button>
+            </NavLink>
           </div>
         </div>
-      </div>
-
-      {/* MOBILE SEARCH BAR */}
+  </div>
+ {/* MOBILE SEARCH BAR */}
       {isMobileSearchOpen && (
         <div className="border-t border-slate-100 bg-white p-4 md:hidden animate-in slide-in-from-top-2">
-           <form onSubmit={handleSearch} className="flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2">
+          <form onSubmit={handleSearch} className="flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2">
             <Search className="h-4 w-4 text-slate-400" />
             <input
               name="q"
@@ -182,9 +210,6 @@ function SiteHeader() {
           </form>
         </div>
       )}
-    </header>
-
-
     {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex lg:hidden">
             <div 
@@ -224,7 +249,7 @@ function SiteHeader() {
             </div>
         </div>
     )}
-    </>
+ </header>
   );
 }
 
