@@ -83,7 +83,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, initialLiked 
   };
 
     const handleCardClick = () => {
-        navigate(`/product/${product.id}`);
+        navigate(`/product/${product.slug}`);
     };
 
     return (
