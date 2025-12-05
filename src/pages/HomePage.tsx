@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 import { fetchProducts, type ApiProduct } from "@/services/api";
 
 function HomePage() {
-  
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,10 +21,10 @@ function HomePage() {
       try {
         setLoading(true);
         const response = await fetchProducts();
+        // @ts-expect-error: "data" property exists on response
         const apiProducts = response.data;
         console.log('all product', apiProducts)
 
-        
         const transformedProducts: Product[] = apiProducts.map(
           (product: ApiProduct) => ({
             id: product.id.toString(),
