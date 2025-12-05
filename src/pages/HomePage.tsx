@@ -23,6 +23,7 @@ function HomePage() {
         const response = await fetchProducts();
         // @ts-expect-error: "data" property exists on response
         const apiProducts = response.data;
+        console.log('all product', apiProducts)
 
         const transformedProducts: Product[] = apiProducts.map(
           (product: ApiProduct) => ({

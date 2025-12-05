@@ -28,6 +28,12 @@ const SHOP_STYLES = [
 
 function SiteHeader() {
   const [isShopMenuOpen, setIsShopMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  // const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // const handleShopClick = () => {
+  //   setIsShopMenuOpen(prev => !prev);
+  // };
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [wishlistPulseKey, setWishlistPulseKey] = useState(0);
@@ -61,6 +67,11 @@ function SiteHeader() {
       navigate(`/products?search=${query}`);
       setIsMobileSearchOpen(false);
     }
+  };
+
+  const handleLogout = () => {
+    // TODO: Implement logout logic
+    setIsUserMenuOpen(false);
   };
 
   return (
@@ -218,11 +229,56 @@ function SiteHeader() {
             </Link>
             <NavLink to="/cart">
               <Button
-                size="icon"
-                variant="ghost"
-                className="rounded-full border border-slate-200"
+                size='icon'
+                variant='ghost'
+                className='rounded-full border border-slate-200'
               >
-                <ShoppingBag className="size-4" />
+                <UserRound className='size-4' />
+              </Button>
+
+              {/* User Menu Dropdown */}
+              <div
+                className={`absolute right-0 top-[calc(100%+8px)] z-50 w-48 rounded-md border border-slate-100 bg-white p-2 shadow-xl transition-all duration-200 ${
+                  isUserMenuOpen
+                    ? 'visible opacity-100 translate-y-0'
+                    : 'invisible opacity-0 -translate-y-2'
+                }`}
+              >
+                <div className='absolute -top-2 right-4 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white'></div>
+
+                <Link
+                  to='/profile'
+                  onClick={() => setIsUserMenuOpen(false)}
+                  className='block rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600'
+                >
+                  Thông tin cá nhân
+                </Link>
+
+                <Link
+                  to='/orders'
+                  onClick={() => setIsUserMenuOpen(false)}
+                  className='block rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600'
+                >
+                  Đơn hàng
+                </Link>
+
+                <div className='my-1 border-t border-slate-100'></div>
+
+                <button
+                  onClick={handleLogout}
+                  className='block w-full rounded-md px-4 py-2 text-left text-sm text-slate-600 hover:bg-slate-50 hover:text-red-600'
+                >
+                  Đăng xuất
+                </button>
+              </div>
+            </div>
+            <NavLink to='/cart'>
+              <Button
+                size='icon'
+                variant='ghost'
+                className='rounded-full border border-slate-200'
+              >
+                <ShoppingBag className='size-4' />
               </Button>
             </NavLink>
           </div>

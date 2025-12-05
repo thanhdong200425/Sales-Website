@@ -17,7 +17,7 @@ import PaymentPage from "./pages/PaymentPage.tsx";
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <App />,
     children: [
       {
@@ -33,15 +33,15 @@ const router = createBrowserRouter([
         element: <ProductListPage />,
       },
       {
-        path: "pipeline",
+        path: 'pipeline',
         element: <PipelinePage />,
       },
       {
-        path: "reports",
+        path: 'reports',
         element: <ReportsPage />,
       },
       {
-        path: "cart",
+        path: 'cart',
         element: <CartPage />,
       },
       {
@@ -60,12 +60,12 @@ const router = createBrowserRouter([
     errorElement: <NotFoundPage />,
   },
   {
-    path: "*",
+    path: '*',
     element: <NotFoundPage />,
   },
 ]);
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <RouterProvider router={router} />
   </StrictMode>
