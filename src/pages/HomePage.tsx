@@ -23,6 +23,7 @@ function HomePage() {
         setLoading(true);
         const response = await fetchProducts();
         const apiProducts = response.data;
+        console.log('all product', apiProducts)
 
         
         const transformedProducts: Product[] = apiProducts.map(

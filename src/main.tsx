@@ -1,20 +1,21 @@
-import { StrictMode } from "react"
-import { createRoot } from "react-dom/client"
-import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import App from "./App.tsx"
-import "./index.css"
-import CartPage from "./pages/CartPage.tsx"
-import HomePage from "./pages/HomePage.tsx"
-import NotFoundPage from "./pages/NotFoundPage.tsx"
-import PipelinePage from "./pages/PipelinePage.tsx"
-import ReportsPage from "./pages/ReportsPage.tsx"
-import ProductListPage from "./pages/ProductListPage.tsx"
-import ProductDetailPage from "./pages/DetailPage.tsx"
+import App from './App.tsx';
+import './index.css';
+import CartPage from './pages/CartPage.tsx';
+import HomePage from './pages/HomePage.tsx';
+import NotFoundPage from './pages/NotFoundPage.tsx';
+import PipelinePage from './pages/PipelinePage.tsx';
+import ReportsPage from './pages/ReportsPage.tsx';
+import ProductListPage from './pages/ProductListPage.tsx';
+import ProductDetailPage from './pages/DetailPage.tsx';
+import ProfilePage from './pages/ProfilePage.tsx';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <App />,
     children: [
       {
@@ -22,36 +23,40 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: "products", 
+        path: 'products',
         element: <ProductListPage />,
       },
       {
-        path: "pipeline",
+        path: 'pipeline',
         element: <PipelinePage />,
       },
       {
-        path: "reports",
+        path: 'reports',
         element: <ReportsPage />,
       },
       {
-        path: "cart",
+        path: 'cart',
         element: <CartPage />,
       },
       {
-        path: "product/:slug",
-        element: <ProductDetailPage/>
-      }
+        path: 'product/:slug',
+        element: <ProductDetailPage />,
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />,
+      },
     ],
     errorElement: <NotFoundPage />,
   },
   {
-    path: "*",
+    path: '*',
     element: <NotFoundPage />,
   },
-])
+]);
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <RouterProvider router={router} />
-  </StrictMode>,
-)
+  </StrictMode>
+);
