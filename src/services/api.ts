@@ -58,7 +58,6 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
-
 export interface UserResponse {
   success: boolean;
   user: User;
@@ -80,9 +79,7 @@ export interface ChangePasswordResponse {
   message: string;
 }
 
-export async function fetchProducts(
-  filters: ProductFilters = {}
-): Promise<ProductsResponse[]> {
+export async function fetchProducts(filters: ProductFilters = {}): Promise<ProductsResponse[]> {
   try {
     const params = new URLSearchParams(filters as Record<string, string>).toString();
     const url = `${API_BASE_URL}/api/items${params ? `?${params}` : ''}`;
@@ -100,7 +97,7 @@ export async function fetchProducts(
 }
 export async function fetchFeaturedProducts(): Promise<ApiProduct[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/products/featured`);
+    const response = await fetch(`${API_BASE_URL}/api/items/featured`);
     if (!response.ok) {
       throw new Error(`Failed to fetch featured products: ${response.statusText}`);
     }
