@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 
-const HERO_IMAGE = "./public/hero.png";
+const HERO_IMAGE = "./hero.png";
 
 const HERO_STATS = [
   { label: "International Brands", value: "200+" },
