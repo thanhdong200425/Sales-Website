@@ -44,7 +44,21 @@ function SiteHeader() {
   const [wishlistPulseKey, setWishlistPulseKey] = useState(0);
   const [showWishlistPulse, setShowWishlistPulse] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+      setIsLoggedIn(!!token);
+    };
+
+    checkAuth();
+    // Check on storage change (when login/logout in another tab)
+    window.addEventListener('storage', checkAuth);
+    return () => window.removeEventListener('storage', checkAuth);
+  }, []);
 
   useEffect(() => {
     const handleWishlistPulse = () => {
@@ -74,8 +88,17 @@ function SiteHeader() {
     }
   };
   const handleLogout = () => {
-    // TODO: Implement logout logic
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
     setIsUserMenuOpen(false);
+    navigate('/');
+    // Optional: Show toast notification
+    if (window.dispatchEvent) {
+      window.dispatchEvent(new CustomEvent('toast', {
+        detail: { type: 'success', message: 'Đã đăng xuất thành công' }
+      }));
+    }
   };
 
   return (
@@ -189,44 +212,57 @@ function SiteHeader() {
           </form>
 
           <div className='flex items-center gap-3'>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size='icon'
-                  variant='ghost'
-                  className='rounded-full border border-slate-200'
-                >
+            {isLoggedIn ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size='icon'
+                    variant='ghost'
+                    className='rounded-full border border-slate-200'
+                  >
+                    <UserRound className='size-4' />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end' className='w-48'>
+                  <DropdownMenuItem asChild>
+                    <Link to='/profile' className='flex items-center gap-2 cursor-pointer'>
+                      <User className='size-4' />
+                      <span>Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to='/order-status'
+                      className='flex items-center gap-2 cursor-pointer'
+                    >
+                      <Package className='size-4' />
+                      <span>Order Status</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <button
+                      type='button'
+                      onClick={()=>handleLogout()}
+                      className='flex items-center gap-2 cursor-pointer w-full text-left'
+                    >
+                      <LogOut className='size-4' />
+                      <span>Logout</span>
+                    </button>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                asChild
+                variant='outline'
+                className='rounded-full border border-slate-200'
+              >
+                <Link to='/login' className='flex items-center gap-2'>
                   <UserRound className='size-4' />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-48'>
-                <DropdownMenuItem asChild>
-                  <Link to='/profile' className='flex items-center gap-2 cursor-pointer'>
-                    <User className='size-4' />
-                    <span>Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    to='/order-status'
-                    className='flex items-center gap-2 cursor-pointer'
-                  >
-                    <Package className='size-4' />
-                    <span>Order Status</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <button
-                    type='button'
-                    onClick={()=>handleLogout()}
-                    className='flex items-center gap-2 cursor-pointer'
-                  >
-                    <LogOut className='size-4' />
-                    <span>Logout</span>
-                  </button>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <span className='hidden sm:inline'>Đăng Nhập</span>
+                </Link>
+              </Button>
+            )}
             <Link to='/wishlist'>
               <div className='relative'>
                 <Button

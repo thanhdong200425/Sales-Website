@@ -15,6 +15,9 @@ import OrderStatusPage from "./pages/OrderStatusPage.tsx";
 import WishlistPage from "./pages/WishlistPage.tsx"
 import PaymentPage from "./pages/PaymentPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage.tsx";
+import PaymentFailedPage from "./pages/PaymentFailedPage.tsx";
+import LoginPage from "./pages/LoginPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -60,6 +63,18 @@ const router = createBrowserRouter([
       {
         path: 'profile',
         element: <ProfilePage />,
+      },
+      {
+        path: 'payment/success',
+        element: <PaymentSuccessPage />,
+      },
+      {
+        path: 'payment/failed',
+        element: <PaymentFailedPage />,
+      },
+      {
+        path: 'login',
+        element: <LoginPage />,
       },
     ],
     errorElement: <NotFoundPage />,
