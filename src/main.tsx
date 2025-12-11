@@ -13,10 +13,12 @@ import ProductListPage from "./pages/ProductListPage.tsx";
 import ProductDetailPage from "./pages/DetailPage.tsx";
 import OrderStatusPage from "./pages/OrderStatusPage.tsx";
 import WishlistPage from "./pages/WishlistPage.tsx"
+import PaymentPage from "./pages/PaymentPage.tsx";
+import ProfilePage from "./pages/ProfilePage.tsx";
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <App />,
     children: [
       {
@@ -24,43 +26,51 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: "/wishlist",
-        element: <WishlistPage />, 
+        path: '/wishlist',
+        element: <WishlistPage />,
       },
       {
-        path: "products",
+        path: 'products',
         element: <ProductListPage />,
       },
       {
-        path: "pipeline",
+        path: 'pipeline',
         element: <PipelinePage />,
       },
       {
-        path: "reports",
+        path: 'reports',
         element: <ReportsPage />,
       },
       {
-        path: "cart",
+        path: 'cart',
         element: <CartPage />,
       },
       {
-        path: "product/:slug",
+        path: 'checkout',
+        element: <PaymentPage />,
+      },
+      {
+        path: 'product/:slug',
         element: <ProductDetailPage />,
       },
       {
-        path: "order-status",
+        path: 'order-status',
         element: <OrderStatusPage />,
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />,
       },
     ],
     errorElement: <NotFoundPage />,
   },
   {
-    path: "*",
+    path: '*',
     element: <NotFoundPage />,
   },
 ]);
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <RouterProvider router={router} />
   </StrictMode>
