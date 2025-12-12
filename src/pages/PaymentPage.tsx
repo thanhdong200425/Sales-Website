@@ -1,13 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { createPayment } from "@/services/api";
+import { toast } from "sonner";
 
 function PaymentPage() {
   const navigate = useNavigate();
-  const { cartItems } = useCart();
+  const { cartItems, clearCart } = useCart();
+  const [paymentMethod, setPaymentMethod] = useState("bank");
+  const [isLoading, setIsLoading] = useState(false);
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -17,11 +22,57 @@ function PaymentPage() {
   const deliveryFee = 15;
   const total = subtotal - discount + deliveryFee;
 
-  const handlePlaceOrder = (event: React.FormEvent<HTMLFormElement>) => {
+  const handlePlaceOrder = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsLoading(true);
 
-    // TODO: Gửi dữ liệu thanh toán lên backend khi đã có API
-    navigate("/order-status");
+    try {
+      const formData = new FormData(event.currentTarget);
+      const customerName = formData.get("customerName") as string;
+      const email = formData.get("email") as string;
+      const phone = formData.get("phone") as string;
+      const address = formData.get("address") as string;
+
+      // Nếu chọn VNPay, tạo payment URL
+      if (paymentMethod === "vnpay") {
+        // Chuyển đổi cartItems sang format API
+        const items = cartItems.map((item) => ({
+          productId: parseInt(item.id), // Parse id string thành number
+          quantity: item.quantity,
+          color: item.color,
+          size: item.size || "Default",
+        }));
+
+        const response = await createPayment({
+          items: items,
+          shippingInfo: {
+            customerName: customerName,
+            phone: phone,
+            address: address,
+          },
+        });
+
+        if (response.success && response.data.paymentUrl) {
+          // Redirect đến VNPay
+          window.location.href = response.data.paymentUrl;
+          return;
+        } else {
+          throw new Error(response.message || "Failed to create payment");
+        }
+      } else {
+        // Các phương thức thanh toán khác (bank, momo) - chưa implement
+        toast.info("Phương thức thanh toán này chưa được hỗ trợ", {
+          description: "Vui lòng chọn VNPay để thanh toán.",
+        });
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      toast.error("Đã xảy ra lỗi", {
+        description: error instanceof Error ? error.message : "Không thể tạo đơn hàng. Vui lòng thử lại.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (cartItems.length === 0) {
@@ -97,12 +148,17 @@ function PaymentPage() {
                 </div>
 
                 <form className="space-y-6" onSubmit={handlePlaceOrder}>
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-4">
                     <div className="space-y-1.5">
                       <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                        Full name
+                        Họ và tên
                       </label>
-                      <Input placeholder="Enter your full name" required />
+                      <Input
+                        type="text"
+                        name="customerName"
+                        placeholder="Nguyễn Văn A"
+                        required
+                      />
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-xs font-medium text-slate-700 sm:text-sm">
@@ -110,129 +166,33 @@ function PaymentPage() {
                       </label>
                       <Input
                         type="email"
+                        name="email"
                         placeholder="you@example.com"
                         required
                       />
                     </div>
+
                     <div className="space-y-1.5">
                       <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                        Phone number
+                        Số điện thoại
                       </label>
-                      <Input placeholder="+1 (555) 000-0000" required />
+                      <Input
+                        type="tel"
+                        name="phone"
+                        placeholder="+84 123 456 789"
+                        required
+                      />
                     </div>
+
                     <div className="space-y-1.5">
                       <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                        Country
+                        Địa chỉ
                       </label>
-                      <Input placeholder="Country" required />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                      Address
-                    </label>
-                    <Input placeholder="Street address" required />
-                  </div>
-
-                  <div className="grid gap-4 sm:grid-cols-3">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                        City
-                      </label>
-                      <Input placeholder="City" required />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                        State / Province
-                      </label>
-                      <Input placeholder="State / Province" required />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                        ZIP / Postal code
-                      </label>
-                      <Input placeholder="Postal code" required />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 pt-2">
-                    <div>
-                      <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
-                        Payment Method
-                      </h2>
-                      <p className="mt-1 text-xs text-slate-500 sm:text-sm">
-                        Select your preferred payment method.
-                      </p>
-                    </div>
-
-                    <div className="grid gap-3 sm:grid-cols-3">
-                      <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 hover:border-slate-300 sm:text-sm">
-                        <input
-                          type="radio"
-                          name="payment-method"
-                          value="card"
-                          defaultChecked
-                          className="size-3 border-slate-300 text-slate-900 focus:ring-slate-900 sm:size-4"
-                        />
-                        <span>Credit / Debit Card</span>
-                      </label>
-                      <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 hover:border-slate-300 sm:text-sm">
-                        <input
-                          type="radio"
-                          name="payment-method"
-                          value="paypal"
-                          className="size-3 border-slate-300 text-slate-900 focus:ring-slate-900 sm:size-4"
-                        />
-                        <span>PayPal</span>
-                      </label>
-                      <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 hover:border-slate-300 sm:text-sm">
-                        <input
-                          type="radio"
-                          name="payment-method"
-                          value="cod"
-                          className="size-3 border-slate-300 text-slate-900 focus:ring-slate-900 sm:size-4"
-                        />
-                        <span>Cash on Delivery</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                          Card number
-                        </label>
-                        <Input placeholder="1234 5678 9012 3456" required />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                          Name on card
-                        </label>
-                        <Input placeholder="Full name" required />
-                      </div>
-                    </div>
-
-                    <div className="grid gap-4 sm:grid-cols-3">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                          Expiry date
-                        </label>
-                        <Input placeholder="MM / YY" required />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                          CVV
-                        </label>
-                        <Input placeholder="123" required />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                          Promo code (optional)
-                        </label>
-                        <Input placeholder="Enter code" />
-                      </div>
+                      <Input
+                        name="address"
+                        placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố"
+                        required
+                      />
                     </div>
                   </div>
 
@@ -245,8 +205,9 @@ function PaymentPage() {
                       type="submit"
                       size="lg"
                       className="w-full bg-slate-900 text-white hover:bg-slate-800 sm:w-auto"
+                      disabled={isLoading}
                     >
-                      Place Order
+                      {isLoading ? "Đang xử lý..." : "Place Order"}
                     </Button>
                   </div>
                 </form>
@@ -296,8 +257,56 @@ function PaymentPage() {
                   </div>
                 </div>
 
+                {/* Payment Method Selection */}
+                <div className="mt-6 space-y-3 border-t border-slate-200 pt-4 sm:pt-6">
+                  <h3 className="text-sm font-semibold text-slate-900 sm:text-base">
+                    Phương thức thanh toán
+                  </h3>
+                  <div className="space-y-2">
+                    <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:border-slate-300 hover:bg-slate-50">
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value="bank"
+                        checked={paymentMethod === "bank"}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className="size-4 border-slate-300 text-slate-900 focus:ring-slate-900"
+                      />
+                      <span className="text-sm font-medium text-slate-900">
+                        Chuyển khoản ngân hàng
+                      </span>
+                    </label>
+                    <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:border-slate-300 hover:bg-slate-50">
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value="momo"
+                        checked={paymentMethod === "momo"}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className="size-4 border-slate-300 text-slate-900 focus:ring-slate-900"
+                      />
+                      <span className="text-sm font-medium text-slate-900">
+                        Momo
+                      </span>
+                    </label>
+                    <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:border-slate-300 hover:bg-slate-50">
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value="vnpay"
+                        checked={paymentMethod === "vnpay"}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className="size-4 border-slate-300 text-slate-900 focus:ring-slate-900"
+                      />
+                      <span className="text-sm font-medium text-slate-900">
+                        VNPay
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
                 <p className="mt-4 text-xs text-slate-500 sm:mt-6 sm:text-sm">
-                  All transactions are secure and encrypted. Your card information
+                  All transactions are secure and encrypted. Your payment information
                   is never stored on our servers.
                 </p>
               </CardContent>

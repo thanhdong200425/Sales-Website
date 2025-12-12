@@ -15,6 +15,16 @@ import OrderStatusPage from "./pages/OrderStatusPage.tsx";
 import WishlistPage from "./pages/WishlistPage.tsx"
 import PaymentPage from "./pages/PaymentPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage.tsx";
+import PaymentFailedPage from "./pages/PaymentFailedPage.tsx";
+import LoginPage from "./pages/LoginPage.tsx";
+
+// Vendor imports
+import { VendorAuthProvider, ProtectedVendorRoute } from "./contexts/VendorAuthContext.tsx";
+import { VendorLayout } from "./components/vendor/VendorLayout.tsx";
+import VendorLoginPage from "./pages/vendor/VendorLoginPage.tsx";
+import VendorRegisterPage from "./pages/vendor/VendorRegisterPage.tsx";
+import VendorDashboardPage from "./pages/vendor/VendorDashboardPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -61,8 +71,43 @@ const router = createBrowserRouter([
         path: 'profile',
         element: <ProfilePage />,
       },
+      {
+        path: 'payment/success',
+        element: <PaymentSuccessPage />,
+      },
+      {
+        path: 'payment/failed',
+        element: <PaymentFailedPage />,
+      },
+      {
+        path: 'login',
+        element: <LoginPage />,
+      },
     ],
     errorElement: <NotFoundPage />,
+  },
+  // Vendor routes (separate from customer routes)
+  {
+    path: '/vendor',
+    element: <VendorLayout />,
+    children: [
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedVendorRoute>
+            <VendorDashboardPage />
+          </ProtectedVendorRoute>
+        ),
+      },
+    ],
+  },
+  {
+    path: '/vendor/login',
+    element: <VendorLoginPage />,
+  },
+  {
+    path: '/vendor/register',
+    element: <VendorRegisterPage />,
   },
   {
     path: '*',
@@ -72,6 +117,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <VendorAuthProvider>
+      <RouterProvider router={router} />
+    </VendorAuthProvider>
   </StrictMode>
 );
