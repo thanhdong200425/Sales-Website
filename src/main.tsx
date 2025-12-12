@@ -19,6 +19,13 @@ import PaymentSuccessPage from "./pages/PaymentSuccessPage.tsx";
 import PaymentFailedPage from "./pages/PaymentFailedPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 
+// Vendor imports
+import { VendorAuthProvider, ProtectedVendorRoute } from "./contexts/VendorAuthContext.tsx";
+import { VendorLayout } from "./components/vendor/VendorLayout.tsx";
+import VendorLoginPage from "./pages/vendor/VendorLoginPage.tsx";
+import VendorRegisterPage from "./pages/vendor/VendorRegisterPage.tsx";
+import VendorDashboardPage from "./pages/vendor/VendorDashboardPage.tsx";
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -79,6 +86,29 @@ const router = createBrowserRouter([
     ],
     errorElement: <NotFoundPage />,
   },
+  // Vendor routes (separate from customer routes)
+  {
+    path: '/vendor',
+    element: <VendorLayout />,
+    children: [
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedVendorRoute>
+            <VendorDashboardPage />
+          </ProtectedVendorRoute>
+        ),
+      },
+    ],
+  },
+  {
+    path: '/vendor/login',
+    element: <VendorLoginPage />,
+  },
+  {
+    path: '/vendor/register',
+    element: <VendorRegisterPage />,
+  },
   {
     path: '*',
     element: <NotFoundPage />,
@@ -87,6 +117,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <VendorAuthProvider>
+      <RouterProvider router={router} />
+    </VendorAuthProvider>
   </StrictMode>
 );
