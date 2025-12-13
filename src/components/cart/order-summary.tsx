@@ -1,5 +1,6 @@
 import { ArrowRight, Tag } from "lucide-react"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -14,6 +15,11 @@ interface OrderSummaryProps {
 
 export function OrderSummary({ subtotal, discount, deliveryFee, total }: OrderSummaryProps) {
   const [promoCode, setPromoCode] = useState("")
+  const navigate = useNavigate()
+
+  const handleGoToCheckout = () => {
+    navigate("/checkout")
+  }
 
   return (
     <Card className="h-fit lg:sticky lg:top-4">
@@ -59,7 +65,11 @@ export function OrderSummary({ subtotal, discount, deliveryFee, total }: OrderSu
           </Button>
         </div>
 
-        <Button className="mt-4 w-full bg-slate-900 text-white hover:bg-slate-800 sm:mt-6" size="lg">
+        <Button
+          className="mt-4 w-full bg-slate-900 text-white hover:bg-slate-800 sm:mt-6"
+          size="lg"
+          onClick={handleGoToCheckout}
+        >
           Go to Checkout <ArrowRight className="ml-2 size-4" />
         </Button>
       </CardContent>

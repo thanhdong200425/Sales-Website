@@ -1,16 +1,56 @@
 import React, { useState } from "react";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Check } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Check, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { login, register } from "@/services/api";
+import { toast } from "sonner";
 
-export default function App() {
+export default function LoginPage() {
+  const navigate = useNavigate();
   // State của login page
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRegisterMode, setIsRegisterMode] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Logging in with:", { email, password, rememberMe });
+    setIsLoading(true);
+
+    try {
+      if (isRegisterMode) {
+        // Đăng ký
+        if (!name.trim()) {
+          toast.error("Vui lòng nhập tên");
+          return;
+        }
+        const result = await register({ email, password, name });
+        if (result.success) {
+          toast.success("Đăng ký thành công! Đang đăng nhập...");
+          // Tự động đăng nhập sau khi đăng ký
+          const loginResult = await login({ email, password });
+          if (loginResult.success) {
+            toast.success("Đăng nhập thành công!");
+            navigate("/");
+          }
+        }
+      } else {
+        // Đăng nhập
+        const result = await login({ email, password });
+        if (result.success) {
+          toast.success("Đăng nhập thành công!");
+          // Trigger event để header update
+          window.dispatchEvent(new Event('storage'));
+          navigate("/");
+        }
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Đã xảy ra lỗi. Vui lòng thử lại.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,12 +67,66 @@ export default function App() {
         {/* Page Title */}
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-            Login Or Sign Up
+            {isRegisterMode ? "Đăng Ký" : "Đăng Nhập"}
           </h2>
+          <p className="mt-2 text-sm text-slate-600">
+            {isRegisterMode
+              ? "Tạo tài khoản mới để bắt đầu mua sắm"
+              : "Chào mừng bạn quay trở lại"}
+          </p>
+        </div>
+
+        {/* Toggle Login/Register */}
+        <div className="mb-6 flex items-center justify-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsRegisterMode(false)}
+            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
+              !isRegisterMode
+                ? "bg-slate-900 text-white"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            }`}
+          >
+            Đăng Nhập
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsRegisterMode(true)}
+            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
+              isRegisterMode
+                ? "bg-slate-900 text-white"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            }`}
+          >
+            Đăng Ký
+          </button>
         </div>
 
         {/* Form */}
         <form onSubmit={handleLogin} className="w-full space-y-6">
+          {/* Name Input (chỉ hiện khi đăng ký) */}
+          {isRegisterMode && (
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-slate-700 ml-1">
+                Họ và Tên
+              </label>
+
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                  <User size={20} strokeWidth={2} />
+                </div>
+
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-slate-500 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-slate-400"
+                  placeholder="Nhập họ và tên"
+                  required={isRegisterMode}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Email Input */}
           <div className="space-y-2">
@@ -114,10 +208,17 @@ export default function App() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-zinc-900 hover:bg-black text-white font-medium py-4 rounded-full flex items-center justify-center gap-2 transition-transform active:scale-[0.99] mt-4 shadow-lg shadow-zinc-200"
+            disabled={isLoading}
+            className="w-full bg-zinc-900 hover:bg-black disabled:bg-slate-400 disabled:cursor-not-allowed text-white font-medium py-4 rounded-full flex items-center justify-center gap-2 transition-transform active:scale-[0.99] mt-4 shadow-lg shadow-zinc-200"
           >
-            Continue
-            <ArrowRight size={20} />
+            {isLoading ? (
+              "Đang xử lý..."
+            ) : (
+              <>
+                {isRegisterMode ? "Đăng Ký" : "Đăng Nhập"}
+                <ArrowRight size={20} />
+              </>
+            )}
           </button>
         </form>
       </div>
