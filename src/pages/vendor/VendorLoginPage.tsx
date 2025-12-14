@@ -11,14 +11,15 @@ export default function VendorLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMsg("");
 
     try {
       const response = await loginVendor(email, password);
-      
       if (response.success) {
         login(response.token, response.vendor);
         toast.success("Login successful!");
@@ -42,6 +43,11 @@ export default function VendorLoginPage() {
         </div>
 
         <div className="rounded-2xl bg-white p-8 shadow-xl">
+          {errorMsg && (
+            <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">
+              {errorMsg}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-700">

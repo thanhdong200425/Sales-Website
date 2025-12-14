@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, Link } from "react-router-dom";
 import { Bell, Search, Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -37,7 +37,9 @@ export function VendorLayout() {
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(26,26,26,0.2)]">
                 <Menu className="h-6 w-6 text-slate-900" />
               </div>
+              <Link to="/vendor/dashboard">
               <h1 className="text-lg font-bold text-[#0f172a]">VendorHub</h1>
+              </Link>
             </div>
 
             {/* Search Bar */}

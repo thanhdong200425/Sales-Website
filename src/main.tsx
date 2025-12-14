@@ -25,6 +25,9 @@ import { VendorLayout } from "./components/vendor/VendorLayout.tsx";
 import VendorLoginPage from "./pages/vendor/VendorLoginPage.tsx";
 import VendorRegisterPage from "./pages/vendor/VendorRegisterPage.tsx";
 import VendorDashboardPage from "./pages/vendor/VendorDashboardPage.tsx";
+import VendorProductList from "./pages/vendor/VendorProductListPage.tsx";
+import VendorCreateProductPage from "./pages/vendor/VendorCreateProductPage.tsx";
+import VendorEditProductPage from "./pages/vendor/VendorEditProductPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -96,6 +99,30 @@ const router = createBrowserRouter([
         element: (
           <ProtectedVendorRoute>
             <VendorDashboardPage />
+          </ProtectedVendorRoute>
+        ),
+      },
+      {
+        path: 'products',
+        element: (
+          <ProtectedVendorRoute>
+            <VendorProductList />
+          </ProtectedVendorRoute>
+        ),
+      },
+      {
+        path: 'products/new',
+        element: (
+          <ProtectedVendorRoute>
+            <VendorCreateProductPage />
+          </ProtectedVendorRoute>
+        ),
+      },
+      {
+        path: 'products/edit/:id',
+        element: (
+          <ProtectedVendorRoute>
+            <VendorEditProductPage />
           </ProtectedVendorRoute>
         ),
       },
