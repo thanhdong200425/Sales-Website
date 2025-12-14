@@ -25,6 +25,7 @@ import { VendorLayout } from "./components/vendor/VendorLayout.tsx";
 import VendorLoginPage from "./pages/vendor/VendorLoginPage.tsx";
 import VendorRegisterPage from "./pages/vendor/VendorRegisterPage.tsx";
 import VendorDashboardPage from "./pages/vendor/VendorDashboardPage.tsx";
+import SalesAnalyticsPage from "./pages/vendor/SalesAnalyticsPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -96,6 +97,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedVendorRoute>
             <VendorDashboardPage />
+          </ProtectedVendorRoute>
+        ),
+      },
+      {
+        path: 'analytics',
+        element: (
+          <ProtectedVendorRoute>
+            <SalesAnalyticsPage />
           </ProtectedVendorRoute>
         ),
       },
