@@ -86,7 +86,7 @@ export default function ProductListPage() {
             <h1 className="text-3xl font-bold text-slate-900">My Products</h1>
             <p className="text-slate-500 mt-1">Manage your store inventory</p>
         </div>
-        <Link to="/vendor/products/create">
+        <Link to="/vendor/products/new">
           <Button className="bg-black hover:bg-zinc-800">
             <Plus className="mr-2 h-4 w-4" /> Add New Product
           </Button>
