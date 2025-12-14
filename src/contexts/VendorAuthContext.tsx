@@ -6,6 +6,7 @@ import {
   ReactNode,
 } from "react";
 import { useNavigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 
 interface Vendor {
   id: number;
@@ -28,6 +29,7 @@ interface VendorAuthContextType {
   login: (token: string, vendor: Vendor) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  isInitialized: boolean;
 }
 
 const VendorAuthContext = createContext<VendorAuthContextType | undefined>(
@@ -37,7 +39,7 @@ const VendorAuthContext = createContext<VendorAuthContextType | undefined>(
 export function VendorAuthProvider({ children }: { children: ReactNode }) {
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [token, setToken] = useState<string | null>(null);
-
+const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {
     // Load vendor data from localStorage on mount
     const storedToken = localStorage.getItem("vendorToken");
@@ -53,6 +55,7 @@ export function VendorAuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem("vendorData");
       }
     }
+    setIsInitialized(true);
   }, []);
 
   const login = (newToken: string, vendorData: Vendor) => {
@@ -76,7 +79,8 @@ export function VendorAuthProvider({ children }: { children: ReactNode }) {
         token,
         login,
         logout,
-        isAuthenticated: !!token && !!vendor,
+        isAuthenticated: !!token ,
+        isInitialized,
       }}
     >
       {children}
@@ -94,14 +98,22 @@ export function useVendorAuth() {
 
 // Protected Route Component
 export function ProtectedVendorRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useVendorAuth();
+  const { isAuthenticated, isInitialized } = useVendorAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (isInitialized && !isAuthenticated) {
       navigate("/vendor/login");
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, isInitialized, navigate]);
+
+  if (!isInitialized) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-slate-50">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return null;
