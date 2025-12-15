@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 type StyleCategory = {
   id: string;
@@ -51,9 +52,12 @@ function StyleBrowser() {
                   <p className="text-xl font-semibold text-slate-900">
                     {category.label}
                   </p>
-                  <button className="text-sm font-medium text-slate-500 underline underline-offset-4">
+                  <Link
+                    to={`/products?style=${category.label}`}
+                    className="text-sm font-medium text-slate-500 underline underline-offset-4 hover:text-slate-700 transition-colors"
+                  >
                     Explore
-                  </button>
+                  </Link>
                 </div>
                 <img
                   alt={category.label}
