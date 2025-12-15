@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  // State của login page
+  // Login page state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -21,33 +21,33 @@ export default function LoginPage() {
 
     try {
       if (isRegisterMode) {
-        // Đăng ký
+        // Register
         if (!name.trim()) {
-          toast.error("Vui lòng nhập tên");
+          toast.error("Please enter your name");
           return;
         }
         const result = await register({ email, password, name });
         if (result.success) {
-          toast.success("Đăng ký thành công! Đang đăng nhập...");
-          // Tự động đăng nhập sau khi đăng ký
+          toast.success("Registration successful! Logging in...");
+          // Auto login after registration
           const loginResult = await login({ email, password });
           if (loginResult.success) {
-            toast.success("Đăng nhập thành công!");
+            toast.success("Login successful!");
             navigate("/");
           }
         }
       } else {
-        // Đăng nhập
+        // Login
         const result = await login({ email, password });
         if (result.success) {
-          toast.success("Đăng nhập thành công!");
+          toast.success("Login successful!");
           // Trigger event để header update
-          window.dispatchEvent(new Event('storage'));
+          window.dispatchEvent(new Event("storage"));
           navigate("/");
         }
       }
     } catch (error: any) {
-      toast.error(error.message || "Đã xảy ra lỗi. Vui lòng thử lại.");
+      toast.error(error.message || "An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +55,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen w-full bg-white flex items-center justify-center p-4 sm:p-8">
-
       <div className="w-full max-w-[400px] flex flex-col items-center">
         {/* Logo Area */}
         <div className="mb-12 text-center">
@@ -67,12 +66,12 @@ export default function LoginPage() {
         {/* Page Title */}
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-            {isRegisterMode ? "Đăng Ký" : "Đăng Nhập"}
+            {isRegisterMode ? "Sign Up" : "Login"}
           </h2>
           <p className="mt-2 text-sm text-slate-600">
             {isRegisterMode
-              ? "Tạo tài khoản mới để bắt đầu mua sắm"
-              : "Chào mừng bạn quay trở lại"}
+              ? "Create a new account to start shopping"
+              : "Welcome back"}
           </p>
         </div>
 
@@ -87,7 +86,7 @@ export default function LoginPage() {
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >
-            Đăng Nhập
+            Login
           </button>
           <button
             type="button"
@@ -98,17 +97,17 @@ export default function LoginPage() {
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
           >
-            Đăng Ký
+            Sign Up
           </button>
         </div>
 
         {/* Form */}
         <form onSubmit={handleLogin} className="w-full space-y-6">
-          {/* Name Input (chỉ hiện khi đăng ký) */}
+          {/* Name Input (only shown when registering) */}
           {isRegisterMode && (
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-700 ml-1">
-                Họ và Tên
+                Full Name
               </label>
 
               <div className="relative">
@@ -121,7 +120,7 @@ export default function LoginPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-slate-500 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-slate-400"
-                  placeholder="Nhập họ và tên"
+                  placeholder="Enter your full name"
                   required={isRegisterMode}
                 />
               </div>
@@ -164,7 +163,7 @@ export default function LoginPage() {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-11 pr-11 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-slate-500 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-slate-400 tracking-widest"
+                className="w-full pl-11 pr-11 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-slate-500 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-slate-400"
                 placeholder="Enter your password"
               />
 
@@ -187,10 +186,16 @@ export default function LoginPage() {
               <div
                 className={`
                   w-5 h-5 rounded flex items-center justify-center transition-colors border
-                  ${rememberMe ? "bg-sky-500 border-sky-500" : "bg-white border-slate-300"}
+                  ${
+                    rememberMe
+                      ? "bg-sky-500 border-sky-500"
+                      : "bg-white border-slate-300"
+                  }
                 `}
               >
-                {rememberMe && <Check size={14} className="text-white stroke-[4]" />}
+                {rememberMe && (
+                  <Check size={14} className="text-white stroke-[4]" />
+                )}
               </div>
               <span className="text-sm font-medium text-slate-700 group-hover:text-black transition-colors">
                 Remember Me
@@ -212,10 +217,10 @@ export default function LoginPage() {
             className="w-full bg-zinc-900 hover:bg-black disabled:bg-slate-400 disabled:cursor-not-allowed text-white font-medium py-4 rounded-full flex items-center justify-center gap-2 transition-transform active:scale-[0.99] mt-4 shadow-lg shadow-zinc-200"
           >
             {isLoading ? (
-              "Đang xử lý..."
+              "Processing..."
             ) : (
               <>
-                {isRegisterMode ? "Đăng Ký" : "Đăng Nhập"}
+                {isRegisterMode ? "Sign Up" : "Login"}
                 <ArrowRight size={20} />
               </>
             )}
