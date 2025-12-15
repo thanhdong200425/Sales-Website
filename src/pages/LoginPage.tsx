@@ -31,17 +31,26 @@ export default function LoginPage() {
           toast.success("Registration successful! Logging in...");
           // Auto login after registration
           const loginResult = await login({ email, password });
-          if (loginResult.success) {
+          if (loginResult.success && loginResult.user) {
+            // Save user info to localStorage
+            localStorage.setItem("userId", loginResult.user.id.toString());
+            localStorage.setItem("userName", loginResult.user.name);
+            localStorage.setItem("userEmail", loginResult.user.email);
             toast.success("Login successful!");
+            window.dispatchEvent(new Event("storage"));
             navigate("/");
           }
         }
       } else {
         // Login
         const result = await login({ email, password });
-        if (result.success) {
+        if (result.success && result.user) {
+          // Save user info to localStorage
+          localStorage.setItem("userId", result.user.id.toString());
+          localStorage.setItem("userName", result.user.name);
+          localStorage.setItem("userEmail", result.user.email);
           toast.success("Login successful!");
-          // Trigger event để header update
+          // Trigger event to update header
           window.dispatchEvent(new Event("storage"));
           navigate("/");
         }
