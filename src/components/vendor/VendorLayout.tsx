@@ -104,26 +104,6 @@ export function VendorLayout() {
           </div>
 
           {/* Bottom Section - Premium Badge */}
-          <div className="p-6">
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#137fec] to-[#2563eb] p-4 shadow-sm">
-              <div className="relative z-10 space-y-3">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
-                  <Crown className="h-5 w-5 text-white" />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-sm font-bold text-white">
-                    Premium Vendor
-                  </h3>
-                  <p className="text-xs leading-tight text-white/80">
-                    Your store is performing in the top 5% this month.
-                  </p>
-                </div>
-                <button className="flex w-full items-center justify-center rounded-3xl bg-white/20 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-white/30">
-                  View Badge
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </aside>
 

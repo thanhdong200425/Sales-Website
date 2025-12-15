@@ -100,10 +100,13 @@ export async function getVendorStats() {
 }
 
 export async function getRevenueOverview(period: string = "30days") {
-  const response = await fetch(`${API_BASE_URL}/dashboard/revenue-overview?period=${period}`, {
-    method: "GET",
-    headers: createVendorAuthHeaders(),
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/dashboard/revenue-overview?period=${period}`,
+    {
+      method: "GET",
+      headers: createVendorAuthHeaders(),
+    }
+  );
 
   const data = await response.json();
 
@@ -114,7 +117,11 @@ export async function getRevenueOverview(period: string = "30days") {
   return data;
 }
 
-export async function getVendorOrders(page: number = 1, limit: number = 10, status: string = "all") {
+export async function getVendorOrders(
+  page: number = 1,
+  limit: number = 10,
+  status: string = "all"
+) {
   const response = await fetch(
     `${API_BASE_URL}/dashboard/orders?page=${page}&limit=${limit}&status=${status}`,
     {
@@ -177,3 +184,50 @@ export async function getPerformanceMetrics() {
   return data;
 }
 
+// Vendor Orders APIs
+export async function getSalesAnalytics(year?: number) {
+  const url = year
+    ? `${API_BASE_URL}/orders/analytics?year=${year}`
+    : `${API_BASE_URL}/orders/analytics`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: createVendorAuthHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to get sales analytics");
+  }
+
+  return data;
+}
+
+export async function getVendorOrdersList(
+  page: number = 1,
+  limit: number = 10,
+  status?: string
+) {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+
+  if (status && status !== "all") {
+    params.append("status", status);
+  }
+
+  const response = await fetch(`${API_BASE_URL}/orders?${params.toString()}`, {
+    method: "GET",
+    headers: createVendorAuthHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to get orders");
+  }
+
+  return data;
+}
