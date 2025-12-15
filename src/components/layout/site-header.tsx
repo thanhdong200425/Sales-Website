@@ -272,7 +272,7 @@ function SiteHeader() {
               >
                 <Link to="/login" className="flex items-center gap-2">
                   <UserRound className="size-4" />
-                  <span className="hidden sm:inline">Đăng Nhập</span>
+                  <span className="hidden sm:inline">Login</span>
                 </Link>
               </Button>
             )}

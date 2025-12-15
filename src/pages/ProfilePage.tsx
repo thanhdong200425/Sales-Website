@@ -352,7 +352,7 @@ export default function ProfilePage() {
                   type={showCurrentPassword ? "text" : "password"}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full pl-11 pr-11 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-slate-900 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-slate-400 tracking-widest"
+                  className="w-full pl-11 pr-11 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-slate-900 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-slate-400 "
                   placeholder="Enter current password"
                 />
                 <button
@@ -382,7 +382,7 @@ export default function ProfilePage() {
                   type={showNewPassword ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full pl-11 pr-11 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-slate-900 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-slate-400 tracking-widest"
+                  className="w-full pl-11 pr-11 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-slate-900 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-slate-400 "
                   placeholder="Enter new password"
                 />
                 <button
@@ -408,7 +408,7 @@ export default function ProfilePage() {
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-11 pr-11 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-slate-900 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-slate-400 tracking-widest"
+                  className="w-full pl-11 pr-11 py-3.5 bg-slate-50 border border-slate-200 rounded-full text-slate-900 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-slate-400 "
                   placeholder="Confirm new password"
                 />
                 <button
