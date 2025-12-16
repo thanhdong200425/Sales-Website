@@ -11,27 +11,33 @@ import ReportsPage from "./pages/ReportsPage.tsx";
 import ProductListPage from "./pages/ProductListPage.tsx";
 import ProductDetailPage from "./pages/DetailPage.tsx";
 import OrderStatusPage from "./pages/OrderStatusPage.tsx";
-import WishlistPage from "./pages/WishlistPage.tsx"
+import WishlistPage from "./pages/WishlistPage.tsx";
 import PaymentPage from "./pages/PaymentPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage.tsx";
 import PaymentFailedPage from "./pages/PaymentFailedPage.tsx";
+import OrderSuccessPage from "./pages/OrderSuccessPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import NotificationPage from "./pages/NotificationPage.tsx";
 
 // Vendor imports
-import { VendorAuthProvider, ProtectedVendorRoute } from "./contexts/VendorAuthContext.tsx";
+import {
+  VendorAuthProvider,
+  ProtectedVendorRoute,
+} from "./contexts/VendorAuthContext.tsx";
 import { VendorLayout } from "./components/vendor/VendorLayout.tsx";
 import VendorLoginPage from "./pages/vendor/VendorLoginPage.tsx";
 import VendorRegisterPage from "./pages/vendor/VendorRegisterPage.tsx";
 import VendorDashboardPage from "./pages/vendor/VendorDashboardPage.tsx";
+import SalesAnalyticsPage from "./pages/vendor/SalesAnalyticsPage.tsx";
+import { OrderHistoryPage } from "./pages/OrderHistoryPage.tsx";
 import VendorProductList from "./pages/vendor/VendorProductListPage.tsx";
 import VendorCreateProductPage from "./pages/vendor/VendorCreateProductPage.tsx";
 import VendorEditProductPage from "./pages/vendor/VendorEditProductPage.tsx";
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <App />,
     children: [
       {
@@ -39,39 +45,43 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: '/wishlist',
+        path: "/wishlist",
         element: <WishlistPage />,
       },
       {
-        path: 'products',
+        path: "products",
         element: <ProductListPage />,
       },
       {
-        path: 'pipeline',
+        path: "pipeline",
         element: <PipelinePage />,
       },
       {
-        path: 'reports',
+        path: "reports",
         element: <ReportsPage />,
       },
       {
-        path: 'cart',
+        path: "cart",
         element: <CartPage />,
       },
       {
-        path: 'checkout',
+        path: "checkout",
         element: <PaymentPage />,
       },
       {
-        path: 'product/:slug',
+        path: "product/:slug",
         element: <ProductDetailPage />,
       },
       {
-        path: 'order-status',
+        path: "order-status",
         element: <OrderStatusPage />,
       },
       {
-        path: 'profile',
+        path: "order-history",
+        element: <OrderHistoryPage />,
+      },
+      {
+        path: "profile",
         element: <ProfilePage />,
       },
       {
@@ -83,11 +93,15 @@ const router = createBrowserRouter([
         element: <PaymentSuccessPage />,
       },
       {
-        path: 'payment/failed',
+        path: "payment/failed",
         element: <PaymentFailedPage />,
       },
       {
-        path: 'login',
+        path: "order-success",
+        element: <OrderSuccessPage />,
+      },
+      {
+        path: "login",
         element: <LoginPage />,
       },
     ],
@@ -95,11 +109,11 @@ const router = createBrowserRouter([
   },
   // Vendor routes (separate from customer routes)
   {
-    path: '/vendor',
+    path: "/vendor",
     element: <VendorLayout />,
     children: [
       {
-        path: 'dashboard',
+        path: "dashboard",
         element: (
           <ProtectedVendorRoute>
             <VendorDashboardPage />
@@ -107,6 +121,10 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "analytics",
+        element: (
+          <ProtectedVendorRoute>
+            <SalesAnalyticsPage />
         path: 'products',
         element: (
           <ProtectedVendorRoute>
@@ -133,20 +151,20 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: '/vendor/login',
+    path: "/vendor/login",
     element: <VendorLoginPage />,
   },
   {
-    path: '/vendor/register',
+    path: "/vendor/register",
     element: <VendorRegisterPage />,
   },
   {
-    path: '*',
+    path: "*",
     element: <NotFoundPage />,
   },
 ]);
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <VendorAuthProvider>
       <RouterProvider router={router} />

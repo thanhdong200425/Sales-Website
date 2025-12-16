@@ -1,10 +1,21 @@
-import { Outlet, useNavigate, Link } from "react-router-dom";
-import { Bell, Search, Menu } from "lucide-react";
+import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
+import {
+  BarChart3,
+  Package,
+  ShoppingCart,
+  Settings,
+  Crown,
+  Bell, 
+  Search, 
+  Men,
+  u
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function VendorLayout() {
   const navigate = useNavigate();
-  const [vendorName, setVendorName] = useState("Alex Morgan");
+  const location = useLocation();
+  const [vendorName, setVendorName] = useState("TechGear Pro");
 
   useEffect(() => {
     // Check if vendor is authenticated
@@ -18,13 +29,18 @@ export function VendorLayout() {
     if (vendorData) {
       try {
         const vendor = JSON.parse(vendorData);
-        setVendorName(vendor.contactName || vendor.businessName || "Vendor");
+        setVendorName(
+          vendor.contactName || vendor.businessName || "TechGear Pro"
+        );
       } catch (e) {
         console.error("Failed to parse vendor data", e);
       }
     }
   }, [navigate]);
 
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
   return (
     <div className="flex min-h-screen flex-col bg-[#f7f7f7]">
       {/* Header */}
@@ -53,36 +69,79 @@ export function VendorLayout() {
             </div>
           </div>
 
-          {/* Right Section */}
-          <div className="flex items-center gap-4">
-            {/* Notification Bell */}
-            <button className="relative flex h-10 w-10 items-center justify-center rounded-full bg-[#e5e5e5]">
-              <Bell className="h-5 w-5 text-slate-700" />
-              {/* Notification Badge */}
-              <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full border border-[#142210] bg-[#1a1a1a]"></span>
-            </button>
+  const navItems = [
+    { path: "/vendor/dashboard", label: "Dashboard", icon: BarChart3 },
+    { path: "/vendor/analytics", label: "Sales Analytics", icon: BarChart3 },
+    { path: "/vendor/products", label: "Products", icon: Package },
+    { path: "/vendor/orders", label: "Orders", icon: ShoppingCart },
+    { path: "/vendor/settings", label: "Settings", icon: Settings },
+  ];
 
-            {/* Vendor Profile */}
-            <div className="flex items-center gap-3 border-l border-[#2c3928] pl-3">
-              <div className="text-right">
-                <p className="text-xs font-bold text-[#0f172a]">{vendorName}</p>
-                <p className="text-[10px] text-[#a3b99d]">Vendor Admin</p>
-              </div>
-              <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-[#2c3928]">
-                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-400 to-purple-500 text-sm font-semibold text-white">
+  return (
+    <div className="flex min-h-screen bg-gradient-to-r from-[#f6f7f8] to-[#f6f7f8]">
+      {/* Sidebar */}
+      <aside className="sticky top-0 h-screen w-[288px] flex-shrink-0 border-r border-[#e2e8f0] bg-white">
+        <div className="flex h-full flex-col justify-between overflow-auto">
+          {/* Top Section */}
+          <div className="space-y-8 p-6">
+            {/* Vendor Info */}
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 overflow-hidden rounded-full shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]">
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-400 to-purple-500 text-lg font-bold text-white">
                   {vendorName.charAt(0).toUpperCase()}
                 </div>
               </div>
+              <div>
+                <h2 className="text-base font-bold text-[#0f172a]">
+                  {vendorName}
+                </h2>
+                <p className="text-xs font-medium text-[#64748b]">
+                  Vendor Portal
+                </p>
+              </div>
             </div>
+
+            {/* Navigation */}
+            <nav className="space-y-2">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.path);
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => navigate(item.path)}
+                    className={`flex w-full items-center gap-3 rounded-full px-4 py-2.5 transition-colors ${
+                      active
+                        ? "bg-[rgba(19,127,236,0.1)] text-[#137fec]"
+                        : "text-[#475569] hover:bg-[#f8fafc]"
+                    }`}
+                  >
+                    <Icon
+                      className={`h-5 w-5 ${
+                        active ? "text-[#137fec]" : "text-[#475569]"
+                      }`}
+                    />
+                    <span
+                      className={`text-sm ${
+                        active ? "font-bold" : "font-medium"
+                      }`}
+                    >
+                      {item.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </nav>
           </div>
+
+          {/* Bottom Section - Premium Badge */}
         </div>
-      </header>
+      </aside>
 
       {/* Main Content */}
-      <main className="flex-1 px-40 py-0">
+      <main className="flex-1 overflow-auto">
         <Outlet />
       </main>
     </div>
   );
 }
-

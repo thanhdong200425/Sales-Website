@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const HERO_IMAGE = "./hero.png";
 
@@ -9,6 +10,8 @@ const HERO_STATS = [
 ];
 
 function Hero() {
+  const navigate = useNavigate();
+
   return (
     <section className="bg-slate-50">
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
@@ -24,14 +27,11 @@ function Hero() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button className="rounded-full px-8 py-6 text-base">
-              Shop now
-            </Button>
             <Button
               className="rounded-full px-8 py-6 text-base"
-              variant="outline"
+              onClick={() => navigate("/products")}
             >
-              View catalog
+              Shop now
             </Button>
           </div>
           <div className="grid gap-6 sm:grid-cols-3">
