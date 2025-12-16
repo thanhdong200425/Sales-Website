@@ -11,7 +11,7 @@ function createVendorAuthHeaders(): HeadersInit {
 
 // Auth APIs
 export async function loginVendor(email: string, password: string) {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+  const response = await fetch(`${API_BASE_URL}/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -36,7 +36,7 @@ export async function registerVendor(data: {
   phone?: string;
   address?: string;
 }) {
-  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+  const response = await fetch(`${API_BASE_URL}/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -54,7 +54,7 @@ export async function registerVendor(data: {
 }
 
 export async function logoutVendor() {
-  const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+  const response = await fetch(`${API_BASE_URL}/logout`, {
     method: "POST",
     headers: createVendorAuthHeaders(),
   });
@@ -69,7 +69,7 @@ export async function logoutVendor() {
 }
 
 export async function getVendorProfile() {
-  const response = await fetch(`${API_BASE_URL}/auth/me`, {
+  const response = await fetch(`${API_BASE_URL}/me`, {
     method: "GET",
     headers: createVendorAuthHeaders(),
   });

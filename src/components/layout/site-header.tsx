@@ -303,7 +303,17 @@ function SiteHeader() {
                 )}
               </div>
             </Link>
-            <NavLink to="/cart">
+            <NavLink to='/notifications'>
+              <Button
+                size='icon'
+                variant='ghost'
+                className='rounded-full border border-slate-200'
+                title='Notifications'
+              >
+                <Bell className='h-5 w-5' />
+              </Button>
+            </NavLink>
+            <NavLink to='/cart'>
               <Button
                 size="icon"
                 variant="ghost"

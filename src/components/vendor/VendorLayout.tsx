@@ -1,10 +1,14 @@
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 import {
   BarChart3,
   Package,
   ShoppingCart,
   Settings,
   Crown,
+  Bell, 
+  Search, 
+  Men,
+  u
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -37,6 +41,33 @@ export function VendorLayout() {
   const isActive = (path: string) => {
     return location.pathname === path;
   };
+  return (
+    <div className="flex min-h-screen flex-col bg-[#f7f7f7]">
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-[#2c3928] bg-[rgba(247,247,247,0.95)] backdrop-blur-sm">
+        <div className="flex items-center justify-between px-10 py-4">
+          {/* Left Section */}
+          <div className="flex items-center gap-8">
+            {/* Logo */}
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(26,26,26,0.2)]">
+                <Menu className="h-6 w-6 text-slate-900" />
+              </div>
+              <Link to="/vendor/dashboard">
+              <h1 className="text-lg font-bold text-[#0f172a]">VendorHub</h1>
+              </Link>
+            </div>
+
+            {/* Search Bar */}
+            <div className="flex h-10 min-w-[160px] max-w-[320px] items-center rounded-full bg-[#e5e5e5] px-4">
+              <Search className="h-5 w-5 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="ml-2 flex-1 bg-transparent text-sm text-[#64748b] placeholder:text-[#64748b] focus:outline-none"
+              />
+            </div>
+          </div>
 
   const navItems = [
     { path: "/vendor/dashboard", label: "Dashboard", icon: BarChart3 },

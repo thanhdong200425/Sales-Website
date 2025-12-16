@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
 import App from "./App.tsx";
 import "./index.css";
 import CartPage from "./pages/CartPage.tsx";
@@ -19,6 +18,7 @@ import PaymentSuccessPage from "./pages/PaymentSuccessPage.tsx";
 import PaymentFailedPage from "./pages/PaymentFailedPage.tsx";
 import OrderSuccessPage from "./pages/OrderSuccessPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
+import NotificationPage from "./pages/NotificationPage.tsx";
 
 // Vendor imports
 import {
@@ -31,6 +31,9 @@ import VendorRegisterPage from "./pages/vendor/VendorRegisterPage.tsx";
 import VendorDashboardPage from "./pages/vendor/VendorDashboardPage.tsx";
 import SalesAnalyticsPage from "./pages/vendor/SalesAnalyticsPage.tsx";
 import { OrderHistoryPage } from "./pages/OrderHistoryPage.tsx";
+import VendorProductList from "./pages/vendor/VendorProductListPage.tsx";
+import VendorCreateProductPage from "./pages/vendor/VendorCreateProductPage.tsx";
+import VendorEditProductPage from "./pages/vendor/VendorEditProductPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -82,7 +85,11 @@ const router = createBrowserRouter([
         element: <ProfilePage />,
       },
       {
-        path: "payment/success",
+        path: 'notifications',
+        element: <NotificationPage />,
+      },
+      {
+        path: 'payment/success',
         element: <PaymentSuccessPage />,
       },
       {
@@ -118,6 +125,26 @@ const router = createBrowserRouter([
         element: (
           <ProtectedVendorRoute>
             <SalesAnalyticsPage />
+        path: 'products',
+        element: (
+          <ProtectedVendorRoute>
+            <VendorProductList />
+          </ProtectedVendorRoute>
+        ),
+      },
+      {
+        path: 'products/new',
+        element: (
+          <ProtectedVendorRoute>
+            <VendorCreateProductPage />
+          </ProtectedVendorRoute>
+        ),
+      },
+      {
+        path: 'products/edit/:id',
+        element: (
+          <ProtectedVendorRoute>
+            <VendorEditProductPage />
           </ProtectedVendorRoute>
         ),
       },

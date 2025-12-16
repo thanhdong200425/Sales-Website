@@ -202,9 +202,7 @@ export default function LoginPage() {
                   }
                 `}
               >
-                {rememberMe && (
-                  <Check size={14} className="text-white stroke-[4]" />
-                )}
+                {rememberMe && <Check size={14} className="text-white stroke-4" />}
               </div>
               <span className="text-sm font-medium text-slate-700 group-hover:text-black transition-colors">
                 Remember Me
