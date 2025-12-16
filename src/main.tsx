@@ -34,6 +34,7 @@ import { OrderHistoryPage } from "./pages/OrderHistoryPage.tsx";
 import VendorProductList from "./pages/vendor/VendorProductListPage.tsx";
 import VendorCreateProductPage from "./pages/vendor/VendorCreateProductPage.tsx";
 import VendorEditProductPage from "./pages/vendor/VendorEditProductPage.tsx";
+import { Toaster } from "./components/ui/sonner.tsx";
 
 const router = createBrowserRouter([
   {
@@ -156,11 +157,21 @@ const router = createBrowserRouter([
   },
   {
     path: "/vendor/login",
-    element: <VendorLoginPage />,
+    element: (
+      <>
+        <VendorLoginPage />
+        <Toaster position="top-right" richColors />
+      </>
+    ),
   },
   {
     path: "/vendor/register",
-    element: <VendorRegisterPage />,
+    element: (
+      <>
+        <VendorRegisterPage />
+        <Toaster position="top-right" richColors />
+      </>
+    ),
   },
   {
     path: "*",

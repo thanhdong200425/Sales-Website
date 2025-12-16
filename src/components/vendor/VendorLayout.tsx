@@ -1,15 +1,7 @@
-import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
-import {
-  BarChart3,
-  Package,
-  ShoppingCart,
-  Settings,
-  Crown,
-  Bell,
-  Search,
-  Menu,
-} from "lucide-react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { BarChart3, Package, ShoppingCart, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Toaster } from "@/components/ui/sonner";
 
 export function VendorLayout() {
   const navigate = useNavigate();
@@ -114,6 +106,7 @@ export function VendorLayout() {
       <main className="flex-1 overflow-auto">
         <Outlet />
       </main>
+      <Toaster position="top-right" richColors />
     </div>
   );
 }
