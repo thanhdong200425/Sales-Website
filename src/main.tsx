@@ -19,6 +19,7 @@ import PaymentFailedPage from "./pages/PaymentFailedPage.tsx";
 import OrderSuccessPage from "./pages/OrderSuccessPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import NotificationPage from "./pages/NotificationPage.tsx";
+import CustomerSupportPage from "./pages/CustomerSupportPage.tsx";
 
 // Vendor imports
 import {
@@ -87,6 +88,10 @@ const router = createBrowserRouter([
       {
         path: "notifications",
         element: <NotificationPage />,
+      },
+      {
+        path: "support",
+        element: <CustomerSupportPage />,
       },
       {
         path: "payment/success",
