@@ -190,7 +190,7 @@ export default function LoginPage() {
                   ${rememberMe ? "bg-sky-500 border-sky-500" : "bg-white border-slate-300"}
                 `}
               >
-                {rememberMe && <Check size={14} className="text-white stroke-[4]" />}
+                {rememberMe && <Check size={14} className="text-white stroke-4" />}
               </div>
               <span className="text-sm font-medium text-slate-700 group-hover:text-black transition-colors">
                 Remember Me
