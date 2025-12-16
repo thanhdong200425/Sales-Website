@@ -22,6 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { handleLogout } from "@/services/api";
 
 const NAV_LINKS = [
   { label: "Shop", to: "/products", isDropdown: true },
@@ -43,7 +44,6 @@ function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [wishlistPulseKey, setWishlistPulseKey] = useState(0);
   const [showWishlistPulse, setShowWishlistPulse] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
@@ -88,24 +88,8 @@ function SiteHeader() {
       setIsMobileSearchOpen(false);
     }
   };
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("wishlist");
-    setIsLoggedIn(false);
-    setIsUserMenuOpen(false);
-    navigate("/");
-    // Optional: Show toast notification
-    if (window.dispatchEvent) {
-      window.dispatchEvent(
-        new CustomEvent("toast", {
-          detail: { type: "success", message: "Logged out successfully" },
-        })
-      );
-    }
+  const handleUserLogout = () => {
+    handleLogout();
   };
 
   return (
@@ -255,7 +239,7 @@ function SiteHeader() {
                   <DropdownMenuItem asChild>
                     <button
                       type="button"
-                      onClick={() => handleLogout()}
+                      onClick={() => handleUserLogout()}
                       className="flex items-center gap-2 cursor-pointer w-full text-left"
                     >
                       <LogOut className="size-4" />

@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { createPayment } from "@/services/api";
+import { createPayment, getUser } from "@/services/api";
 import { toast } from "sonner";
 
 function PaymentPage() {
@@ -13,6 +13,27 @@ function PaymentPage() {
   const { cartItems, clearCart } = useCart();
   const [paymentMethod, setPaymentMethod] = useState("bank");
   const [isLoading, setIsLoading] = useState(false);
+  const [customerName, setCustomerName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await getUser();
+        if (response.success && response.user) {
+          setCustomerName(response.user.name || "");
+          setEmail(response.user.email);
+        }
+      } catch (error) {
+        console.error("Error loading user data:", error);
+        // Silently fail - user can still fill in manually
+      }
+    };
+    fetchUserData();
+  }, []);
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -27,22 +48,16 @@ function PaymentPage() {
     setIsLoading(true);
 
     try {
-      const formData = new FormData(event.currentTarget);
-      const customerName = formData.get("customerName") as string;
-      const email = formData.get("email") as string;
-      const phone = formData.get("phone") as string;
-      const address = formData.get("address") as string;
+      // Convert cartItems to API format
+      const items = cartItems.map((item) => ({
+        productId: parseInt(item.id),
+        quantity: item.quantity,
+        color: item.color,
+        size: item.size || "Default",
+      }));
 
-      // Nếu chọn VNPay, tạo payment URL
+      // If VNPay is selected, create payment URL
       if (paymentMethod === "vnpay") {
-        // Chuyển đổi cartItems sang format API
-        const items = cartItems.map((item) => ({
-          productId: parseInt(item.id), // Parse id string thành number
-          quantity: item.quantity,
-          color: item.color,
-          size: item.size || "Default",
-        }));
-
         const response = await createPayment({
           items: items,
           shippingInfo: {
@@ -53,22 +68,32 @@ function PaymentPage() {
         });
 
         if (response.success && response.data.paymentUrl) {
-          // Redirect đến VNPay
+          // Redirect to VNPay
           window.location.href = response.data.paymentUrl;
           return;
         } else {
           throw new Error(response.message || "Failed to create payment");
         }
+      } else if (paymentMethod === "cod") {
+        // COD payment - Create order without payment
+        toast.success("Order placed successfully", {
+          description: "You will pay when receiving the product.",
+        });
+        clearCart();
+        navigate("/order-success");
       } else {
-        // Các phương thức thanh toán khác (bank, momo) - chưa implement
-        toast.info("Phương thức thanh toán này chưa được hỗ trợ", {
-          description: "Vui lòng chọn VNPay để thanh toán.",
+        // Other payment methods not yet implemented
+        toast.info("Payment method not supported yet", {
+          description: "Please select VNPay or Cash on Delivery.",
         });
       }
     } catch (error) {
       console.error("Error placing order:", error);
-      toast.error("Đã xảy ra lỗi", {
-        description: error instanceof Error ? error.message : "Không thể tạo đơn hàng. Vui lòng thử lại.",
+      toast.error("An error occurred", {
+        description:
+          error instanceof Error
+            ? error.message
+            : "Could not create order. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -151,12 +176,14 @@ function PaymentPage() {
                   <div className="space-y-4">
                     <div className="space-y-1.5">
                       <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                        Họ và tên
+                        Full Name
                       </label>
                       <Input
                         type="text"
                         name="customerName"
-                        placeholder="Nguyễn Văn A"
+                        placeholder="John Doe"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
                         required
                       />
                     </div>
@@ -168,29 +195,37 @@ function PaymentPage() {
                         type="email"
                         name="email"
                         placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled
                         required
+                        className="bg-slate-50 cursor-not-allowed"
                       />
                     </div>
 
                     <div className="space-y-1.5">
                       <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                        Số điện thoại
+                        Phone Number
                       </label>
                       <Input
                         type="tel"
                         name="phone"
                         placeholder="+84 123 456 789"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
                         required
                       />
                     </div>
 
                     <div className="space-y-1.5">
                       <label className="text-xs font-medium text-slate-700 sm:text-sm">
-                        Địa chỉ
+                        Address
                       </label>
                       <Input
                         name="address"
-                        placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố"
+                        placeholder="Street address, ward, district, city/province"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
                         required
                       />
                     </div>
@@ -207,7 +242,7 @@ function PaymentPage() {
                       className="w-full bg-slate-900 text-white hover:bg-slate-800 sm:w-auto"
                       disabled={isLoading}
                     >
-                      {isLoading ? "Đang xử lý..." : "Place Order"}
+                      {isLoading ? "Processing..." : "Place Order"}
                     </Button>
                   </div>
                 </form>
@@ -260,7 +295,7 @@ function PaymentPage() {
                 {/* Payment Method Selection */}
                 <div className="mt-6 space-y-3 border-t border-slate-200 pt-4 sm:pt-6">
                   <h3 className="text-sm font-semibold text-slate-900 sm:text-base">
-                    Phương thức thanh toán
+                    Payment Method
                   </h3>
                   <div className="space-y-2">
                     <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:border-slate-300 hover:bg-slate-50">
@@ -273,20 +308,7 @@ function PaymentPage() {
                         className="size-4 border-slate-300 text-slate-900 focus:ring-slate-900"
                       />
                       <span className="text-sm font-medium text-slate-900">
-                        Chuyển khoản ngân hàng
-                      </span>
-                    </label>
-                    <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:border-slate-300 hover:bg-slate-50">
-                      <input
-                        type="radio"
-                        name="payment-method"
-                        value="momo"
-                        checked={paymentMethod === "momo"}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="size-4 border-slate-300 text-slate-900 focus:ring-slate-900"
-                      />
-                      <span className="text-sm font-medium text-slate-900">
-                        Momo
+                        Bank Transfer
                       </span>
                     </label>
                     <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:border-slate-300 hover:bg-slate-50">
@@ -302,12 +324,25 @@ function PaymentPage() {
                         VNPay
                       </span>
                     </label>
+                    <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 transition-colors hover:border-slate-300 hover:bg-slate-50">
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value="cod"
+                        checked={paymentMethod === "cod"}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className="size-4 border-slate-300 text-slate-900 focus:ring-slate-900"
+                      />
+                      <span className="text-sm font-medium text-slate-900">
+                        Cash on Delivery (COD)
+                      </span>
+                    </label>
                   </div>
                 </div>
 
                 <p className="mt-4 text-xs text-slate-500 sm:mt-6 sm:text-sm">
-                  All transactions are secure and encrypted. Your payment information
-                  is never stored on our servers.
+                  All transactions are secure and encrypted. Your payment
+                  information is never stored on our servers.
                 </p>
               </CardContent>
             </Card>
@@ -319,5 +354,3 @@ function PaymentPage() {
 }
 
 export default PaymentPage;
-
-

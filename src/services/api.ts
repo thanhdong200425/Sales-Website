@@ -1,5 +1,32 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+// Logout utility function
+export function handleLogout(): void {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("token");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("userName");
+  localStorage.removeItem("userEmail");
+  localStorage.removeItem("wishlist");
+
+  // Trigger storage event to update UI components
+  window.dispatchEvent(new Event("storage"));
+
+  // Redirect to login page
+  window.location.href = "/login";
+}
+
+// Helper function to handle API responses and check for auth errors
+async function handleApiResponse(response: Response): Promise<any> {
+  // Check for authentication errors
+  if (response.status === 401 || response.status === 403) {
+    handleLogout();
+    throw new Error("Session expired. Please login again.");
+  }
+
+  return response;
+}
+
 export interface ProductImage {
   id: number;
   url: string;
@@ -193,6 +220,8 @@ export async function getUser(): Promise<UserResponse> {
       headers: createAuthHeaders(),
     });
 
+    await handleApiResponse(response);
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(
@@ -214,6 +243,8 @@ export async function updateUser(data: UpdateUserData): Promise<UserResponse> {
       headers: createAuthHeaders(),
       body: JSON.stringify(data),
     });
+
+    await handleApiResponse(response);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -241,6 +272,8 @@ export async function changePassword(
         newPassword: data.newPassword,
       }),
     });
+
+    await handleApiResponse(response);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -332,6 +365,8 @@ export async function createPayment(
       headers: createAuthHeaders(),
       body: JSON.stringify(data),
     });
+
+    await handleApiResponse(response);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
