@@ -381,3 +381,158 @@ export async function createPayment(
     throw error;
   }
 }
+
+// Order interfaces
+export interface CreateCodOrderRequest {
+  items: Array<{
+    productId: number;
+    quantity: number;
+    color?: string;
+    size?: string;
+  }>;
+  shippingInfo: {
+    customerName: string;
+    phone?: string;
+    address: string;
+  };
+}
+
+export interface CreateCodOrderResponse {
+  success: boolean;
+  message: string;
+  data: {
+    orderId: number;
+    orderNumber: string;
+    amount: number;
+    status: string;
+  };
+}
+
+export interface OrderItem {
+  id: number;
+  productId: number;
+  productName: string;
+  quantity: number;
+  price: string;
+  color?: string;
+  size?: string;
+  image?: string;
+}
+
+export interface OrderEvent {
+  id: number;
+  status: string;
+  description?: string;
+  createdAt: string;
+}
+
+export interface Order {
+  id: number;
+  orderNumber: string;
+  userId: number;
+  customerName: string;
+  shippingAddress: string;
+  trackingNumber?: string;
+  totalAmount: string;
+  status: string;
+  items: OrderItem[];
+  timeline: OrderEvent[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GetOrdersResponse {
+  success: boolean;
+  data: Order[];
+}
+
+export interface GetOrderResponse {
+  success: boolean;
+  data: Order;
+}
+
+/**
+ * Tạo đơn hàng với phương thức COD
+ * @param data - Thông tin đơn hàng và địa chỉ giao hàng
+ * @returns Thông tin đơn hàng đã tạo
+ */
+export async function createCodOrder(
+  data: CreateCodOrderRequest
+): Promise<CreateCodOrderResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/payments/create-cod`, {
+      method: "POST",
+      headers: createAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Failed to create COD order: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error creating COD order:", error);
+    throw error;
+  }
+}
+
+/**
+ * Lấy danh sách đơn hàng của user
+ * @returns Danh sách đơn hàng
+ */
+export async function getOrders(): Promise<GetOrdersResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/orders`, {
+      method: "GET",
+      headers: createAuthHeaders(),
+    });
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Failed to fetch orders: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    throw error;
+  }
+}
+
+/**
+ * Lấy chi tiết đơn hàng theo ID
+ * @param orderId - ID của đơn hàng
+ * @returns Chi tiết đơn hàng
+ */
+export async function getOrderById(orderId: number): Promise<GetOrderResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
+      method: "GET",
+      headers: createAuthHeaders(),
+    });
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Failed to fetch order: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    throw error;
+  }
+}

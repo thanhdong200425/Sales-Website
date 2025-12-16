@@ -5,7 +5,7 @@ import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { createPayment, getUser } from "@/services/api";
+import { createPayment, createCodOrder, getUser } from "@/services/api";
 import { toast } from "sonner";
 
 function PaymentPage() {
@@ -76,11 +76,24 @@ function PaymentPage() {
         }
       } else if (paymentMethod === "cod") {
         // COD payment - Create order without payment
-        toast.success("Order placed successfully", {
-          description: "You will pay when receiving the product.",
+        const response = await createCodOrder({
+          items: items,
+          shippingInfo: {
+            customerName: customerName,
+            phone: phone,
+            address: address,
+          },
         });
-        clearCart();
-        navigate("/order-success");
+
+        if (response.success && response.data) {
+          toast.success("Order placed successfully", {
+            description: "You will pay when receiving the product.",
+          });
+          clearCart();
+          navigate(`/order-success?orderId=${response.data.orderId}`);
+        } else {
+          throw new Error(response.message || "Failed to create order");
+        }
       } else {
         // Other payment methods not yet implemented
         toast.info("Payment method not supported yet", {
