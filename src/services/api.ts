@@ -1,19 +1,19 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 // Logout utility function
 export function handleLogout(): void {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("token");
-  localStorage.removeItem("userId");
-  localStorage.removeItem("userName");
-  localStorage.removeItem("userEmail");
-  localStorage.removeItem("wishlist");
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('token');
+  localStorage.removeItem('userId');
+  localStorage.removeItem('userName');
+  localStorage.removeItem('userEmail');
+  localStorage.removeItem('wishlist');
 
   // Trigger storage event to update UI components
-  window.dispatchEvent(new Event("storage"));
+  window.dispatchEvent(new Event('storage'));
 
   // Redirect to login page
-  window.location.href = "/login";
+  window.location.href = '/login';
 }
 
 // Helper function to handle API responses and check for auth errors
@@ -21,7 +21,7 @@ async function handleApiResponse(response: Response): Promise<any> {
   // Check for authentication errors
   if (response.status === 401 || response.status === 403) {
     handleLogout();
-    throw new Error("Session expired. Please login again.");
+    throw new Error('Session expired. Please login again.');
   }
 
   return response;
@@ -66,6 +66,7 @@ export interface ProductsResponse {
     totalPages: number;
   };
 }
+
 
 export interface ProductFilters {
   style?: string;
@@ -158,15 +159,31 @@ export interface CreatePaymentResponse {
     amountVND: number;
   };
 }
+export async function getProductDetail(slug: string): Promise<ApiProduct> {
+  const response = await fetch(`${API_BASE_URL}/api/products/${slug}`);
+
+  if (!response.ok) {
+    throw new Error('Product not found');
+  }
+
+  return response.json();
+}
+
+export async function getProductDetailById(id: number): Promise<ApiProduct> {
+  const response = await fetch(`${API_BASE_URL}/api/products/id/${id}`);
+  if (!response.ok) { 
+    throw new Error('Product not found or ID is invalid');
+  }
+  return (await response.json()) as ApiProduct;
+}
+
 
 export async function fetchProducts(
   filters: ProductFilters = {}
 ): Promise<ProductsResponse> {
   try {
-    const params = new URLSearchParams(
-      filters as Record<string, string>
-    ).toString();
-    const url = `${API_BASE_URL}/api/items${params ? `?${params}` : ""}`;
+    const params = new URLSearchParams(filters as Record<string, string>).toString();
+    const url = `${API_BASE_URL}/api/items${params ? `?${params}` : ''}`;
 
     const response = await fetch(url);
     if (!response.ok) {
@@ -175,7 +192,7 @@ export async function fetchProducts(
 
     return await response.json();
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error('Error fetching products:', error);
     throw error;
   }
 }
@@ -183,31 +200,29 @@ export async function fetchFeaturedProducts(): Promise<ApiProduct[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/items/featured`);
     if (!response.ok) {
-      throw new Error(
-        `Failed to fetch featured products: ${response.statusText}`
-      );
+      throw new Error(`Failed to fetch featured products: ${response.statusText}`);
     }
     return await response.json();
   } catch (error) {
-    console.error("Error fetching featured products:", error);
+    console.error('Error fetching featured products:', error);
     throw error;
   }
 }
 
 // Helper function to get auth token from storage
 function getAuthToken(): string | null {
-  return localStorage.getItem("accessToken") || localStorage.getItem("token");
+  return localStorage.getItem('accessToken') || localStorage.getItem('token');
 }
 
 // Helper function to create headers with auth
 function createAuthHeaders(): HeadersInit {
   const token = getAuthToken();
   const headers: HeadersInit = {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   };
 
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
   return headers;
@@ -216,7 +231,7 @@ function createAuthHeaders(): HeadersInit {
 export async function getUser(): Promise<UserResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/users/me`, {
-      method: "GET",
+      method: 'GET',
       headers: createAuthHeaders(),
     });
 
@@ -231,7 +246,7 @@ export async function getUser(): Promise<UserResponse> {
 
     return await response.json();
   } catch (error) {
-    console.error("Error fetching user:", error);
+    console.error('Error fetching user:', error);
     throw error;
   }
 }
@@ -239,7 +254,7 @@ export async function getUser(): Promise<UserResponse> {
 export async function updateUser(data: UpdateUserData): Promise<UserResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/users/me`, {
-      method: "PUT",
+      method: 'PUT',
       headers: createAuthHeaders(),
       body: JSON.stringify(data),
     });
@@ -255,7 +270,7 @@ export async function updateUser(data: UpdateUserData): Promise<UserResponse> {
 
     return await response.json();
   } catch (error) {
-    console.error("Error updating user:", error);
+    console.error('Error updating user:', error);
     throw error;
   }
 }
@@ -265,7 +280,7 @@ export async function changePassword(
 ): Promise<ChangePasswordResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/users/me/password`, {
-      method: "PUT",
+      method: 'PUT',
       headers: createAuthHeaders(),
       body: JSON.stringify({
         oldPassword: data.oldPassword,
@@ -284,7 +299,7 @@ export async function changePassword(
 
     return await response.json();
   } catch (error) {
-    console.error("Error changing password:", error);
+    console.error('Error changing password:', error);
     throw error;
   }
 }
@@ -297,26 +312,24 @@ export async function changePassword(
 export async function login(data: LoginRequest): Promise<LoginResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
 
     const result = await response.json();
 
     if (result.success && result.token) {
-      localStorage.setItem("accessToken", result.token);
+      localStorage.setItem('accessToken', result.token);
     }
 
     if (!response.ok) {
-      throw new Error(
-        result.message || `Failed to login: ${response.statusText}`
-      );
+      throw new Error(result.message || `Failed to login: ${response.statusText}`);
     }
 
     return result;
   } catch (error) {
-    console.error("Error logging in:", error);
+    console.error('Error logging in:', error);
     throw error;
   }
 }
@@ -326,27 +339,23 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
  * @param data - Email, password và name (optional)
  * @returns Thông tin user đã đăng ký
  */
-export async function register(
-  data: RegisterRequest
-): Promise<RegisterResponse> {
+export async function register(data: RegisterRequest): Promise<RegisterResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
 
     const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(
-        result.message || `Failed to register: ${response.statusText}`
-      );
+      throw new Error(result.message || `Failed to register: ${response.statusText}`);
     }
 
     return result;
   } catch (error) {
-    console.error("Error registering:", error);
+    console.error('Error registering:', error);
     throw error;
   }
 }
@@ -361,7 +370,7 @@ export async function createPayment(
 ): Promise<CreatePaymentResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/payments/create`, {
-      method: "POST",
+      method: 'POST',
       headers: createAuthHeaders(),
       body: JSON.stringify(data),
     });
@@ -377,7 +386,7 @@ export async function createPayment(
 
     return await response.json();
   } catch (error) {
-    console.error("Error creating payment:", error);
+    console.error('Error creating payment:', error);
     throw error;
   }
 }
@@ -411,6 +420,7 @@ export interface CreateCodOrderResponse {
 export interface OrderItem {
   id: number;
   productId: number;
+  slug: string,
   productName: string;
   quantity: number;
   price: string;
@@ -441,6 +451,27 @@ export interface Order {
   updatedAt: string;
 }
 
+// Reviews
+export interface Review {
+  id: number;
+  rating: number;
+  comment: string | null;
+  userId: number;
+  productId: number;
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    id: number;
+    name: string | null;
+  };
+}
+
+export interface ProductReviewsResponse {
+  reviews: Review[];
+  averageRating: number;
+  totalReviews: number;
+}
+
 export interface GetOrdersResponse {
   success: boolean;
   data: Order[];
@@ -449,6 +480,40 @@ export interface GetOrdersResponse {
 export interface GetOrderResponse {
   success: boolean;
   data: Order;
+}
+
+export async function getProductReviews(
+  productId: number
+): Promise<ProductReviewsResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/reviews/product/${productId}`);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch product reviews: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function createReview(
+  productId: number,
+  data: { userId: number; rating: number; comment?: string }
+): Promise<Review> {
+  const response = await fetch(`${API_BASE_URL}/api/reviews/${productId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || 'Failed to submit review');
+  }
+
+  // Backend returns { message, data }
+  return result.data as Review;
 }
 
 /**
@@ -461,7 +526,7 @@ export async function createCodOrder(
 ): Promise<CreateCodOrderResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/payments/create-cod`, {
-      method: "POST",
+      method: 'POST',
       headers: createAuthHeaders(),
       body: JSON.stringify(data),
     });
@@ -477,7 +542,7 @@ export async function createCodOrder(
 
     return await response.json();
   } catch (error) {
-    console.error("Error creating COD order:", error);
+    console.error('Error creating COD order:', error);
     throw error;
   }
 }
@@ -489,7 +554,7 @@ export async function createCodOrder(
 export async function getOrders(): Promise<GetOrdersResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/orders`, {
-      method: "GET",
+      method: 'GET',
       headers: createAuthHeaders(),
     });
 
@@ -504,7 +569,7 @@ export async function getOrders(): Promise<GetOrdersResponse> {
 
     return await response.json();
   } catch (error) {
-    console.error("Error fetching orders:", error);
+    console.error('Error fetching orders:', error);
     throw error;
   }
 }
@@ -517,7 +582,7 @@ export async function getOrders(): Promise<GetOrdersResponse> {
 export async function getOrderById(orderId: number): Promise<GetOrderResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
-      method: "GET",
+      method: 'GET',
       headers: createAuthHeaders(),
     });
 
@@ -532,7 +597,7 @@ export async function getOrderById(orderId: number): Promise<GetOrderResponse> {
 
     return await response.json();
   } catch (error) {
-    console.error("Error fetching order:", error);
+    console.error('Error fetching order:', error);
     throw error;
   }
 }

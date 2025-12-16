@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import type { Order } from "@/services/api";
+import { getProductDetail, getProductDetailById, type Order } from "@/services/api";
 
 interface OrderListProps {
   orders: Order[];
@@ -55,6 +55,33 @@ export const OrderList: React.FC<OrderListProps> = ({ orders }) => {
     } catch (error) {
       console.error("Error fetching product:", error);
     }
+  };
+
+  const handleReview = async ( id: number) => {
+    try {
+     console.log('slug', id)
+      const response = await getProductDetailById(id)
+      if (response) {
+        const product =  response;
+        if (product.slug) {
+          navigate(`/product/${product.slug}#reviews`);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching product for review:', error);
+    }
+  };
+
+  const canReview = (order: Order) => {
+    // Check if order has been shipped (has "Shipped" event in timeline)
+    const hasShipped = order.timeline?.some(
+      (event) => event.status.toLowerCase() === 'shipped'
+    );
+    // Or check if status is SHIPPED/DELIVERED
+    const isShippedOrDelivered = ['shipped', 'delivered', 'completed'].includes(
+      order.status.toLowerCase()
+    );
+    return hasShipped || isShippedOrDelivered;
   };
 
   return (
@@ -157,6 +184,14 @@ export const OrderList: React.FC<OrderListProps> = ({ orders }) => {
                   >
                     View Order
                   </button>
+                  {canReview(order) && (
+                    <button
+                      onClick={() => handleReview( item.productId)}
+                      className="px-6 py-3 rounded-full border border-gray-200 text-black font-medium hover:bg-gray-50 transition-colors text-sm whitespace-nowrap"
+                    >
+                      Review
+                    </button>
+                  )}
                   <button
                     onClick={() => handleBuyAgain(item.productId)}
                     className="px-6 py-3 rounded-full bg-black text-white font-medium hover:bg-gray-800 transition-transform active:scale-95 text-sm whitespace-nowrap shadow-md"
