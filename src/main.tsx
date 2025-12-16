@@ -85,11 +85,11 @@ const router = createBrowserRouter([
         element: <ProfilePage />,
       },
       {
-        path: 'notifications',
+        path: "notifications",
         element: <NotificationPage />,
       },
       {
-        path: 'payment/success',
+        path: "payment/success",
         element: <PaymentSuccessPage />,
       },
       {
@@ -125,7 +125,11 @@ const router = createBrowserRouter([
         element: (
           <ProtectedVendorRoute>
             <SalesAnalyticsPage />
-        path: 'products',
+          </ProtectedVendorRoute>
+        ),
+      },
+      {
+        path: "products",
         element: (
           <ProtectedVendorRoute>
             <VendorProductList />
@@ -133,7 +137,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'products/new',
+        path: "products/new",
         element: (
           <ProtectedVendorRoute>
             <VendorCreateProductPage />
@@ -141,7 +145,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'products/edit/:id',
+        path: "products/edit/:id",
         element: (
           <ProtectedVendorRoute>
             <VendorEditProductPage />

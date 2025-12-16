@@ -11,13 +11,13 @@ import {
   LogOut,
   ClipboardList,
   History,
+  Bell,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -303,17 +303,17 @@ function SiteHeader() {
                 )}
               </div>
             </Link>
-            <NavLink to='/notifications'>
+            <NavLink to="/notifications">
               <Button
-                size='icon'
-                variant='ghost'
-                className='rounded-full border border-slate-200'
-                title='Notifications'
+                size="icon"
+                variant="ghost"
+                className="rounded-full border border-slate-200"
+                title="Notifications"
               >
-                <Bell className='h-5 w-5' />
+                <Bell className="h-5 w-5" />
               </Button>
             </NavLink>
-            <NavLink to='/cart'>
+            <NavLink to="/cart">
               <Button
                 size="icon"
                 variant="ghost"
