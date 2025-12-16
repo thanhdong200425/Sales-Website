@@ -91,9 +91,7 @@ function OrderStatusPage() {
           <h1 className="mb-3 text-2xl font-bold text-slate-900">
             No orders found
           </h1>
-          <p className="text-slate-600">
-            You haven't placed any orders yet.
-          </p>
+          <p className="text-slate-600">You haven't placed any orders yet.</p>
           <Link
             to="/products"
             className="mt-4 inline-block text-sm font-medium text-slate-900 underline hover:text-slate-700"
@@ -114,14 +112,20 @@ function OrderStatusPage() {
   const total = subtotal - shippingDiscount - platformFees;
 
   // Check if this is a COD order by looking at the timeline
-  const isCODOrder = selectedOrder.timeline.some(
-    (event) => event.description?.includes("Cash on Delivery")
+  const isCODOrder = selectedOrder.timeline.some((event) =>
+    event.description?.includes("Cash on Delivery")
   );
 
   const getOrderSteps = (status: string, isCOD: boolean) => {
     if (isCOD) {
       // COD flow: Order Made -> Shipped -> Completed -> Order Paid (after delivery)
-      const codStatuses = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "PAID"];
+      const codStatuses = [
+        "PENDING",
+        "PROCESSING",
+        "SHIPPED",
+        "DELIVERED",
+        "PAID",
+      ];
       const currentIndex = codStatuses.indexOf(status);
 
       return {
@@ -132,7 +136,13 @@ function OrderStatusPage() {
       };
     } else {
       // Regular flow: Order Made -> Order Paid -> Shipped -> Completed
-      const regularStatuses = ["PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED"];
+      const regularStatuses = [
+        "PENDING",
+        "PAID",
+        "PROCESSING",
+        "SHIPPED",
+        "DELIVERED",
+      ];
       const currentIndex = regularStatuses.indexOf(status);
 
       return {
@@ -179,9 +189,6 @@ function OrderStatusPage() {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      Send Invoice
-                    </Button>
                     <Button
                       size="sm"
                       className="bg-orange-600 hover:bg-orange-700"
@@ -208,65 +215,215 @@ function OrderStatusPage() {
 
                 {/* Progress Steps */}
                 <div className="grid grid-cols-4 gap-4 pt-4">
-                  <div className={`rounded-lg border-2 p-4 ${steps.orderMade ? "border-orange-600 bg-orange-50" : "border-slate-200 bg-white"}`}>
-                    <div className={`flex size-10 items-center justify-center rounded-lg ${steps.orderMade ? "bg-orange-600" : "bg-slate-100"}`}>
-                      <Package className={`size-5 ${steps.orderMade ? "text-white" : "text-slate-400"}`} />
+                  <div
+                    className={`rounded-lg border-2 p-4 ${
+                      steps.orderMade
+                        ? "border-orange-600 bg-orange-50"
+                        : "border-slate-200 bg-white"
+                    }`}
+                  >
+                    <div
+                      className={`flex size-10 items-center justify-center rounded-lg ${
+                        steps.orderMade ? "bg-orange-600" : "bg-slate-100"
+                      }`}
+                    >
+                      <Package
+                        className={`size-5 ${
+                          steps.orderMade ? "text-white" : "text-slate-400"
+                        }`}
+                      />
                     </div>
-                    <p className={`mt-3 font-medium ${steps.orderMade ? "text-slate-900" : "text-slate-600"}`}>
+                    <p
+                      className={`mt-3 font-medium ${
+                        steps.orderMade ? "text-slate-900" : "text-slate-600"
+                      }`}
+                    >
                       Order made
                     </p>
                     <p className="text-xs text-slate-500">Create order</p>
                   </div>
                   {isCODOrder ? (
                     <>
-                      <div className={`rounded-lg border-2 p-4 ${steps.shipped ? "border-orange-600 bg-orange-50" : "border-slate-200 bg-white"}`}>
-                        <div className={`flex size-10 items-center justify-center rounded-lg ${steps.shipped ? "bg-orange-600" : "bg-slate-100"}`}>
-                          <Truck className={`size-5 ${steps.shipped ? "text-white" : "text-slate-400"}`} />
+                      <div
+                        className={`rounded-lg border-2 p-4 ${
+                          steps.shipped
+                            ? "border-orange-600 bg-orange-50"
+                            : "border-slate-200 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`flex size-10 items-center justify-center rounded-lg ${
+                            steps.shipped ? "bg-orange-600" : "bg-slate-100"
+                          }`}
+                        >
+                          <Truck
+                            className={`size-5 ${
+                              steps.shipped ? "text-white" : "text-slate-400"
+                            }`}
+                          />
                         </div>
-                        <p className={`mt-3 font-medium ${steps.shipped ? "text-slate-900" : "text-slate-600"}`}>Shipped</p>
+                        <p
+                          className={`mt-3 font-medium ${
+                            steps.shipped ? "text-slate-900" : "text-slate-600"
+                          }`}
+                        >
+                          Shipped
+                        </p>
                         <p className="text-xs text-slate-500">On delivery</p>
                       </div>
-                      <div className={`rounded-lg border-2 p-4 ${steps.completed ? "border-orange-600 bg-orange-50" : "border-slate-200 bg-white"}`}>
-                        <div className={`flex size-10 items-center justify-center rounded-lg ${steps.completed ? "bg-orange-600" : "bg-slate-100"}`}>
-                          <CheckCircle2 className={`size-5 ${steps.completed ? "text-white" : "text-slate-400"}`} />
+                      <div
+                        className={`rounded-lg border-2 p-4 ${
+                          steps.completed
+                            ? "border-orange-600 bg-orange-50"
+                            : "border-slate-200 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`flex size-10 items-center justify-center rounded-lg ${
+                            steps.completed ? "bg-orange-600" : "bg-slate-100"
+                          }`}
+                        >
+                          <CheckCircle2
+                            className={`size-5 ${
+                              steps.completed ? "text-white" : "text-slate-400"
+                            }`}
+                          />
                         </div>
-                        <p className={`mt-3 font-medium ${steps.completed ? "text-slate-900" : "text-slate-600"}`}>Completed</p>
-                        <p className="text-xs text-slate-500">Order delivered</p>
+                        <p
+                          className={`mt-3 font-medium ${
+                            steps.completed
+                              ? "text-slate-900"
+                              : "text-slate-600"
+                          }`}
+                        >
+                          Completed
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Order delivered
+                        </p>
                       </div>
-                      <div className={`rounded-lg border-2 p-4 ${steps.orderPaid ? "border-orange-600 bg-orange-50" : "border-slate-200 bg-white"}`}>
-                        <div className={`flex size-10 items-center justify-center rounded-lg ${steps.orderPaid ? "bg-orange-600" : "bg-slate-100"}`}>
-                          <CreditCard className={`size-5 ${steps.orderPaid ? "text-white" : "text-slate-400"}`} />
+                      <div
+                        className={`rounded-lg border-2 p-4 ${
+                          steps.orderPaid
+                            ? "border-orange-600 bg-orange-50"
+                            : "border-slate-200 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`flex size-10 items-center justify-center rounded-lg ${
+                            steps.orderPaid ? "bg-orange-600" : "bg-slate-100"
+                          }`}
+                        >
+                          <CreditCard
+                            className={`size-5 ${
+                              steps.orderPaid ? "text-white" : "text-slate-400"
+                            }`}
+                          />
                         </div>
-                        <p className={`mt-3 font-medium ${steps.orderPaid ? "text-slate-900" : "text-slate-600"}`}>
+                        <p
+                          className={`mt-3 font-medium ${
+                            steps.orderPaid
+                              ? "text-slate-900"
+                              : "text-slate-600"
+                          }`}
+                        >
                           Order Paid
                         </p>
-                        <p className="text-xs text-slate-500">Cash on delivery</p>
+                        <p className="text-xs text-slate-500">
+                          Cash on delivery
+                        </p>
                       </div>
                     </>
                   ) : (
                     <>
-                      <div className={`rounded-lg border-2 p-4 ${steps.orderPaid ? "border-orange-600 bg-orange-50" : "border-slate-200 bg-white"}`}>
-                        <div className={`flex size-10 items-center justify-center rounded-lg ${steps.orderPaid ? "bg-orange-600" : "bg-slate-100"}`}>
-                          <CreditCard className={`size-5 ${steps.orderPaid ? "text-white" : "text-slate-400"}`} />
+                      <div
+                        className={`rounded-lg border-2 p-4 ${
+                          steps.orderPaid
+                            ? "border-orange-600 bg-orange-50"
+                            : "border-slate-200 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`flex size-10 items-center justify-center rounded-lg ${
+                            steps.orderPaid ? "bg-orange-600" : "bg-slate-100"
+                          }`}
+                        >
+                          <CreditCard
+                            className={`size-5 ${
+                              steps.orderPaid ? "text-white" : "text-slate-400"
+                            }`}
+                          />
                         </div>
-                        <p className={`mt-3 font-medium ${steps.orderPaid ? "text-slate-900" : "text-slate-600"}`}>
+                        <p
+                          className={`mt-3 font-medium ${
+                            steps.orderPaid
+                              ? "text-slate-900"
+                              : "text-slate-600"
+                          }`}
+                        >
                           Order Paid
                         </p>
-                        <p className="text-xs text-slate-500">Customer payment</p>
+                        <p className="text-xs text-slate-500">
+                          Customer payment
+                        </p>
                       </div>
-                      <div className={`rounded-lg border-2 p-4 ${steps.shipped ? "border-orange-600 bg-orange-50" : "border-slate-200 bg-white"}`}>
-                        <div className={`flex size-10 items-center justify-center rounded-lg ${steps.shipped ? "bg-orange-600" : "bg-slate-100"}`}>
-                          <Truck className={`size-5 ${steps.shipped ? "text-white" : "text-slate-400"}`} />
+                      <div
+                        className={`rounded-lg border-2 p-4 ${
+                          steps.shipped
+                            ? "border-orange-600 bg-orange-50"
+                            : "border-slate-200 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`flex size-10 items-center justify-center rounded-lg ${
+                            steps.shipped ? "bg-orange-600" : "bg-slate-100"
+                          }`}
+                        >
+                          <Truck
+                            className={`size-5 ${
+                              steps.shipped ? "text-white" : "text-slate-400"
+                            }`}
+                          />
                         </div>
-                        <p className={`mt-3 font-medium ${steps.shipped ? "text-slate-900" : "text-slate-600"}`}>Shipped</p>
+                        <p
+                          className={`mt-3 font-medium ${
+                            steps.shipped ? "text-slate-900" : "text-slate-600"
+                          }`}
+                        >
+                          Shipped
+                        </p>
                         <p className="text-xs text-slate-500">On delivery</p>
                       </div>
-                      <div className={`rounded-lg border-2 p-4 ${steps.completed ? "border-orange-600 bg-orange-50" : "border-slate-200 bg-white"}`}>
-                        <div className={`flex size-10 items-center justify-center rounded-lg ${steps.completed ? "bg-orange-600" : "bg-slate-100"}`}>
-                          <CheckCircle2 className={`size-5 ${steps.completed ? "text-white" : "text-slate-400"}`} />
+                      <div
+                        className={`rounded-lg border-2 p-4 ${
+                          steps.completed
+                            ? "border-orange-600 bg-orange-50"
+                            : "border-slate-200 bg-white"
+                        }`}
+                      >
+                        <div
+                          className={`flex size-10 items-center justify-center rounded-lg ${
+                            steps.completed ? "bg-orange-600" : "bg-slate-100"
+                          }`}
+                        >
+                          <CheckCircle2
+                            className={`size-5 ${
+                              steps.completed ? "text-white" : "text-slate-400"
+                            }`}
+                          />
                         </div>
-                        <p className={`mt-3 font-medium ${steps.completed ? "text-slate-900" : "text-slate-600"}`}>Completed</p>
-                        <p className="text-xs text-slate-500">Order completed</p>
+                        <p
+                          className={`mt-3 font-medium ${
+                            steps.completed
+                              ? "text-slate-900"
+                              : "text-slate-600"
+                          }`}
+                        >
+                          Completed
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Order completed
+                        </p>
                       </div>
                     </>
                   )}
@@ -327,7 +484,8 @@ function OrderStatusPage() {
                         </div>
                         <div className="text-right">
                           <p className="font-medium text-slate-900">
-                            {item.quantity} X ${parseFloat(item.price).toFixed(2)}
+                            {item.quantity} X $
+                            {parseFloat(item.price).toFixed(2)}
                           </p>
                         </div>
                       </div>
@@ -344,7 +502,8 @@ function OrderStatusPage() {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-600">Product Price</span>
                       <span className="text-slate-600">
-                        {selectedOrder.items.length} Item{selectedOrder.items.length !== 1 ? "s" : ""}
+                        {selectedOrder.items.length} Item
+                        {selectedOrder.items.length !== 1 ? "s" : ""}
                       </span>
                       <span className="font-medium text-slate-900">
                         ${subtotal.toFixed(2)}

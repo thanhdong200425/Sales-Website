@@ -9,6 +9,8 @@ import {
   X,
   ChevronDown,
   LogOut,
+  ClipboardList,
+  History,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -206,6 +208,39 @@ function SiteHeader() {
           </form>
 
           <div className="flex items-center gap-3">
+            {isLoggedIn && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="rounded-full border border-slate-200"
+                  >
+                    <ClipboardList className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/order-history"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <History className="size-4" />
+                      <span>Order History</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/order-status"
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Package className="size-4" />
+                      <span>Order Status</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -225,15 +260,6 @@ function SiteHeader() {
                     >
                       <User className="size-4" />
                       <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      to="/order-status"
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <Package className="size-4" />
-                      <span>Order Status</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
