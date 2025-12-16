@@ -9,6 +9,7 @@ import {
   X,
   ChevronDown,
   LogOut,
+  Bell,
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -280,6 +281,16 @@ function SiteHeader() {
                 )}
               </div>
             </Link>
+            <NavLink to='/notifications'>
+              <Button
+                size='icon'
+                variant='ghost'
+                className='rounded-full border border-slate-200'
+                title='Notifications'
+              >
+                <Bell className='h-5 w-5' />
+              </Button>
+            </NavLink>
             <NavLink to='/cart'>
               <Button
                 size='icon'

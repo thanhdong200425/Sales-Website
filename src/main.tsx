@@ -17,6 +17,7 @@ import ProfilePage from "./pages/ProfilePage.tsx";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage.tsx";
 import PaymentFailedPage from "./pages/PaymentFailedPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
+import NotificationPage from "./pages/NotificationPage.tsx";
 
 // Vendor imports
 import { VendorAuthProvider, ProtectedVendorRoute } from "./contexts/VendorAuthContext.tsx";
@@ -72,6 +73,10 @@ const router = createBrowserRouter([
       {
         path: 'profile',
         element: <ProfilePage />,
+      },
+      {
+        path: 'notifications',
+        element: <NotificationPage />,
       },
       {
         path: 'payment/success',
