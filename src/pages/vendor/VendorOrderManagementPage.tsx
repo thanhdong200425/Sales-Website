@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   XCircle,
   Search,
-  Filter,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -474,17 +473,28 @@ function OrderDetailsDialog({
   order,
   onUpdateStatus,
 }: OrderDetailsDialogProps) {
-  const [selectedItem, setSelectedItem] = useState<OrderItem | null>(null);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [newStatus, setNewStatus] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");
 
-  const handleSubmit = () => {
-    if (selectedItem && newStatus) {
-      onUpdateStatus(selectedItem.id, newStatus, trackingNumber || undefined);
-      setSelectedItem(null);
+  const handleSubmit = async () => {
+    if (selectedItems.length > 0 && newStatus) {
+      // Update all selected items
+      for (const itemId of selectedItems) {
+        await onUpdateStatus(itemId, newStatus, trackingNumber || undefined);
+      }
+      setShowUpdateForm(false);
+      setSelectedItems([]);
       setNewStatus("");
       setTrackingNumber("");
     }
+  };
+
+  const handleSelectAllItems = () => {
+    setSelectedItems(order.items.map((item) => item.id));
+    setNewStatus(order.items[0]?.status || "PROCESSING");
+    setShowUpdateForm(true);
   };
 
   return (
@@ -531,8 +541,18 @@ function OrderDetailsDialog({
         </div>
 
         {/* Order Items */}
-        <div className="mb-6">
-          <h3 className="mb-4 font-semibold text-[#0f172a]">Order Items</h3>
+        <div>
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="font-semibold text-[#0f172a]">Order Items</h3>
+            {!showUpdateForm && (
+              <button
+                onClick={handleSelectAllItems}
+                className="rounded-lg bg-[#3b82f6] px-4 py-2 text-sm font-medium text-white hover:bg-[#2563eb] transition-colors"
+              >
+                Update Status
+              </button>
+            )}
+          </div>
           <div className="space-y-4">
             {order.items.map((item) => (
               <div
@@ -588,15 +608,6 @@ function OrderDetailsDialog({
                       >
                         {item.status}
                       </span>
-                      <button
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setNewStatus(item.status);
-                        }}
-                        className="ml-auto rounded-lg bg-[#3b82f6] px-4 py-2 text-sm font-medium text-white hover:bg-[#2563eb] transition-colors"
-                      >
-                        Update Status
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -606,10 +617,10 @@ function OrderDetailsDialog({
         </div>
 
         {/* Update Status Form */}
-        {selectedItem && (
+        {showUpdateForm && (
           <div className="mb-6 rounded-lg border-2 border-[#3b82f6] bg-blue-50 p-4">
             <h3 className="mb-4 font-semibold text-[#0f172a]">
-              Update Status for {selectedItem.productName}
+              Update Status for All Order Items
             </h3>
             <div className="space-y-4">
               <div>
@@ -646,11 +657,12 @@ function OrderDetailsDialog({
                   onClick={handleSubmit}
                   className="rounded-lg bg-[#3b82f6] px-6 py-2 text-sm font-medium text-white hover:bg-[#2563eb] transition-colors"
                 >
-                  Update Status
+                  Update All Items
                 </button>
                 <button
                   onClick={() => {
-                    setSelectedItem(null);
+                    setShowUpdateForm(false);
+                    setSelectedItems([]);
                     setNewStatus("");
                     setTrackingNumber("");
                   }}
