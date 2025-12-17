@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useVendorAuth } from "../../contexts/VendorAuthContext";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
 const COLORS = [
   { name: "Black", value: "#000000" },
@@ -45,7 +46,7 @@ export default function CreateProductPage() {
     console.log("Current Token:", token);
 
     if (!token) {
-      alert("Error: Token not found. Please log in again.");
+      toast.error("Token not found. Please log in again.");
       return;
     }
 
@@ -69,18 +70,18 @@ export default function CreateProductPage() {
 
       if (!res.ok) {
         if (data.details === "EMPTY_CATEGORY_ERROR") {
-          alert("Warning: Category list is empty. Please run seed first.");
+          toast.warning("Category list is empty. Please run seed first.");
           return;
         }
         throw new Error(data.message || "Failed to create product");
       }
 
-      alert("Product created successfully!");
+      toast.success("Product created successfully!");
       navigate("/vendor/products");
 
     } catch (error: any) {
       console.error(error);
-      alert("Error: " + error.message);
+      toast.error(error.message || "Failed to create product");
     } finally {
       setLoading(false);
     }
