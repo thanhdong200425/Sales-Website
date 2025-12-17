@@ -31,6 +31,7 @@ const NAV_LINKS = [
   { label: "On Sale", to: "/pipeline" },
   { label: "New Arrivals", to: "/new-arrivals" },
   { label: "Brands", to: "/brands" },
+  { label: "Support", to: "/support" },
 ];
 
 const SHOP_STYLES = [
