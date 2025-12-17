@@ -28,6 +28,8 @@ import {
 import { VendorLayout } from "./components/vendor/VendorLayout.tsx";
 import VendorLoginPage from "./pages/vendor/VendorLoginPage.tsx";
 import VendorRegisterPage from "./pages/vendor/VendorRegisterPage.tsx";
+import VendorForgotPasswordPage from "./pages/vendor/VendorForgotPasswordPage.tsx";
+import VendorResetPasswordPage from "./pages/vendor/VendorResetPasswordPage.tsx";
 import VendorDashboardPage from "./pages/vendor/VendorDashboardPage.tsx";
 import SalesAnalyticsPage from "./pages/vendor/SalesAnalyticsPage.tsx";
 import { OrderHistoryPage } from "./pages/OrderHistoryPage.tsx";
@@ -169,6 +171,24 @@ const router = createBrowserRouter([
     element: (
       <>
         <VendorRegisterPage />
+        <Toaster position="top-right" richColors />
+      </>
+    ),
+  },
+  {
+    path: "/vendor/forgot-password",
+    element: (
+      <>
+        <VendorForgotPasswordPage />
+        <Toaster position="top-right" richColors />
+      </>
+    ),
+  },
+  {
+    path: "/vendor/reset-password",
+    element: (
+      <>
+        <VendorResetPasswordPage />
         <Toaster position="top-right" richColors />
       </>
     ),

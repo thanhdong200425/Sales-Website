@@ -1,11 +1,20 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { BarChart3, Package, ShoppingCart, Settings } from "lucide-react";
+import {
+  BarChart3,
+  Package,
+  ShoppingCart,
+  Settings,
+  LogOut,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { useVendorAuth } from "@/contexts/VendorAuthContext";
+import { toast } from "sonner";
 
 export function VendorLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useVendorAuth();
   const [vendorName, setVendorName] = useState("TechGear Pro");
 
   useEffect(() => {
@@ -40,6 +49,12 @@ export function VendorLayout() {
     { path: "/vendor/orders", label: "Orders", icon: ShoppingCart },
     { path: "/vendor/settings", label: "Settings", icon: Settings },
   ];
+
+  const handleLogout = () => {
+    logout();
+    toast.success("Logged out successfully");
+    navigate("/vendor/login");
+  };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-r from-[#f6f7f8] to-[#f6f7f8]">
@@ -98,7 +113,16 @@ export function VendorLayout() {
             </nav>
           </div>
 
-          {/* Bottom Section - Premium Badge */}
+          {/* Bottom Section - Logout Button */}
+          <div className="border-t border-[#e2e8f0] p-6">
+            <button
+              onClick={handleLogout}
+              className="flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-[#475569] transition-colors hover:bg-red-50 hover:text-red-600"
+            >
+              <LogOut className="h-5 w-5" />
+              <span className="text-sm font-medium">Logout</span>
+            </button>
+          </div>
         </div>
       </aside>
 
