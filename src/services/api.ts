@@ -131,6 +131,30 @@ export interface RegisterResponse {
   user?: User;
 }
 
+// Support interfaces
+export interface SupportContactRequest {
+  name: string;
+  email: string;
+  subject?: string;
+  message: string;
+}
+
+export interface SupportContactResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface SupportChatRequest {
+  message: string;
+}
+
+export interface SupportChatResponse {
+  success: boolean;
+  data: {
+    reply: string;
+  };
+}
+
 // Payment interfaces
 export interface CreatePaymentRequest {
   orderId?: number;
@@ -285,6 +309,60 @@ export async function changePassword(
     return await response.json();
   } catch (error) {
     console.error("Error changing password:", error);
+    throw error;
+  }
+}
+
+export async function sendSupportContact(
+  data: SupportContactRequest
+): Promise<SupportContactResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/support/contact`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.message || `Failed to send contact: ${response.statusText}`
+      );
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Error sending support contact:", error);
+    throw error;
+  }
+}
+
+export async function sendSupportChatMessage(
+  data: SupportChatRequest
+): Promise<SupportChatResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/support/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.message || `Failed to send chat message: ${response.statusText}`
+      );
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Error sending support chat message:", error);
     throw error;
   }
 }
