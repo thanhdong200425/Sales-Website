@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
 import App from "./App.tsx";
 import "./index.css";
 import CartPage from "./pages/CartPage.tsx";
@@ -12,26 +11,38 @@ import ReportsPage from "./pages/ReportsPage.tsx";
 import ProductListPage from "./pages/ProductListPage.tsx";
 import ProductDetailPage from "./pages/DetailPage.tsx";
 import OrderStatusPage from "./pages/OrderStatusPage.tsx";
-import WishlistPage from "./pages/WishlistPage.tsx"
+import WishlistPage from "./pages/WishlistPage.tsx";
 import PaymentPage from "./pages/PaymentPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage.tsx";
 import PaymentFailedPage from "./pages/PaymentFailedPage.tsx";
+import OrderSuccessPage from "./pages/OrderSuccessPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
+import NotificationPage from "./pages/NotificationPage.tsx";
+import CustomerSupportPage from "./pages/CustomerSupportPage.tsx";
 
 // Vendor imports
-import { VendorAuthProvider, ProtectedVendorRoute } from "./contexts/VendorAuthContext.tsx";
+import {
+  VendorAuthProvider,
+  ProtectedVendorRoute,
+} from "./contexts/VendorAuthContext.tsx";
 import { VendorLayout } from "./components/vendor/VendorLayout.tsx";
 import VendorLoginPage from "./pages/vendor/VendorLoginPage.tsx";
 import VendorRegisterPage from "./pages/vendor/VendorRegisterPage.tsx";
+import VendorForgotPasswordPage from "./pages/vendor/VendorForgotPasswordPage.tsx";
+import VendorResetPasswordPage from "./pages/vendor/VendorResetPasswordPage.tsx";
 import VendorDashboardPage from "./pages/vendor/VendorDashboardPage.tsx";
+import SalesAnalyticsPage from "./pages/vendor/SalesAnalyticsPage.tsx";
+import { OrderHistoryPage } from "./pages/OrderHistoryPage.tsx";
 import VendorProductList from "./pages/vendor/VendorProductListPage.tsx";
 import VendorCreateProductPage from "./pages/vendor/VendorCreateProductPage.tsx";
 import VendorEditProductPage from "./pages/vendor/VendorEditProductPage.tsx";
+import VendorOrderManagementPage from "./pages/vendor/VendorOrderManagementPage.tsx";
+import { Toaster } from "./components/ui/sonner.tsx";
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <App />,
     children: [
       {
@@ -39,51 +50,67 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: '/wishlist',
+        path: "/wishlist",
         element: <WishlistPage />,
       },
       {
-        path: 'products',
+        path: "products",
         element: <ProductListPage />,
       },
       {
-        path: 'pipeline',
+        path: "pipeline",
         element: <PipelinePage />,
       },
       {
-        path: 'reports',
+        path: "reports",
         element: <ReportsPage />,
       },
       {
-        path: 'cart',
+        path: "cart",
         element: <CartPage />,
       },
       {
-        path: 'checkout',
+        path: "checkout",
         element: <PaymentPage />,
       },
       {
-        path: 'product/:slug',
+        path: "product/:slug",
         element: <ProductDetailPage />,
       },
       {
-        path: 'order-status',
+        path: "order-status",
         element: <OrderStatusPage />,
       },
       {
-        path: 'profile',
+        path: "order-history",
+        element: <OrderHistoryPage />,
+      },
+      {
+        path: "profile",
         element: <ProfilePage />,
       },
       {
-        path: 'payment/success',
+        path: "notifications",
+        element: <NotificationPage />,
+      },
+      {
+        path: "support",
+        element: <CustomerSupportPage />,
+      },
+      {
+        path: "payment/success",
         element: <PaymentSuccessPage />,
       },
       {
-        path: 'payment/failed',
+        path: "payment/failed",
         element: <PaymentFailedPage />,
       },
       {
-        path: 'login',
+        path: "order-success",
+        element: <OrderSuccessPage />,
+      },
+      {
+        path: "login",
         element: <LoginPage />,
       },
     ],
@@ -91,11 +118,11 @@ const router = createBrowserRouter([
   },
   // Vendor routes (separate from customer routes)
   {
-    path: '/vendor',
+    path: "/vendor",
     element: <VendorLayout />,
     children: [
       {
-        path: 'dashboard',
+        path: "dashboard",
         element: (
           <ProtectedVendorRoute>
             <VendorDashboardPage />
@@ -103,7 +130,15 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'products',
+        path: "analytics",
+        element: (
+          <ProtectedVendorRoute>
+            <SalesAnalyticsPage />
+          </ProtectedVendorRoute>
+        ),
+      },
+      {
+        path: "products",
         element: (
           <ProtectedVendorRoute>
             <VendorProductList />
@@ -111,7 +146,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'products/new',
+        path: "products/new",
         element: (
           <ProtectedVendorRoute>
             <VendorCreateProductPage />
@@ -119,30 +154,66 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'products/edit/:id',
+        path: "products/edit/:id",
         element: (
           <ProtectedVendorRoute>
             <VendorEditProductPage />
           </ProtectedVendorRoute>
         ),
       },
+      {
+        path: "orders",
+        element: (
+          <ProtectedVendorRoute>
+            <VendorOrderManagementPage />
+          </ProtectedVendorRoute>
+        ),
+      },
     ],
   },
   {
-    path: '/vendor/login',
-    element: <VendorLoginPage />,
+    path: "/vendor/login",
+    element: (
+      <>
+        <VendorLoginPage />
+        <Toaster position="top-right" richColors />
+      </>
+    ),
   },
   {
-    path: '/vendor/register',
-    element: <VendorRegisterPage />,
+    path: "/vendor/register",
+    element: (
+      <>
+        <VendorRegisterPage />
+        <Toaster position="top-right" richColors />
+      </>
+    ),
   },
   {
-    path: '*',
+    path: "/vendor/forgot-password",
+    element: (
+      <>
+        <VendorForgotPasswordPage />
+        <Toaster position="top-right" richColors />
+      </>
+    ),
+  },
+  {
+    path: "/vendor/reset-password",
+    element: (
+      <>
+        <VendorResetPasswordPage />
+        <Toaster position="top-right" richColors />
+      </>
+    ),
+  },
+  {
+    path: "*",
     element: <NotFoundPage />,
   },
 ]);
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <VendorAuthProvider>
       <RouterProvider router={router} />

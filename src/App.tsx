@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -7,6 +7,9 @@ import { CartProvider } from "@/contexts/CartContext";
 import { Toaster } from "@/components/ui/sonner";
 
 function App() {
+  const location = useLocation();
+  const hideFooter = location.pathname === "/login";
+
   return (
     <CartProvider>
       <div className="flex min-h-svh flex-col bg-white text-slate-900">
@@ -15,7 +18,7 @@ function App() {
         <main className="flex-1">
           <Outlet />
         </main>
-        <SiteFooter />
+        {!hideFooter && <SiteFooter />}
         {/* <ProductDetailPage/> */}
       </div>
       <Toaster position="top-right" richColors />

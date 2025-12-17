@@ -1,5 +1,32 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+// Logout utility function
+export function handleLogout(): void {
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('token');
+  localStorage.removeItem('userId');
+  localStorage.removeItem('userName');
+  localStorage.removeItem('userEmail');
+  localStorage.removeItem('wishlist');
+
+  // Trigger storage event to update UI components
+  window.dispatchEvent(new Event('storage'));
+
+  // Redirect to login page
+  window.location.href = '/login';
+}
+
+// Helper function to handle API responses and check for auth errors
+async function handleApiResponse(response: Response): Promise<any> {
+  // Check for authentication errors
+  if (response.status === 401 || response.status === 403) {
+    handleLogout();
+    throw new Error('Session expired. Please login again.');
+  }
+
+  return response;
+}
+
 export interface ProductImage {
   id: number;
   url: string;
@@ -39,6 +66,7 @@ export interface ProductsResponse {
     totalPages: number;
   };
 }
+
 
 export interface ProductFilters {
   style?: string;
@@ -104,6 +132,30 @@ export interface RegisterResponse {
   user?: User;
 }
 
+// Support interfaces
+export interface SupportContactRequest {
+  name: string;
+  email: string;
+  subject?: string;
+  message: string;
+}
+
+export interface SupportContactResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface SupportChatRequest {
+  message: string;
+}
+
+export interface SupportChatResponse {
+  success: boolean;
+  data: {
+    reply: string;
+  };
+}
+
 // Payment interfaces
 export interface CreatePaymentRequest {
   orderId?: number;
@@ -131,8 +183,28 @@ export interface CreatePaymentResponse {
     amountVND: number;
   };
 }
+export async function getProductDetail(slug: string): Promise<ApiProduct> {
+  const response = await fetch(`${API_BASE_URL}/api/products/${slug}`);
 
-export async function fetchProducts(filters: ProductFilters = {}): Promise<ProductsResponse[]> {
+  if (!response.ok) {
+    throw new Error('Product not found');
+  }
+
+  return response.json();
+}
+
+export async function getProductDetailById(id: number): Promise<ApiProduct> {
+  const response = await fetch(`${API_BASE_URL}/api/products/id/${id}`);
+  if (!response.ok) { 
+    throw new Error('Product not found or ID is invalid');
+  }
+  return (await response.json()) as ApiProduct;
+}
+
+
+export async function fetchProducts(
+  filters: ProductFilters = {}
+): Promise<ProductsResponse> {
   try {
     const params = new URLSearchParams(filters as Record<string, string>).toString();
     const url = `${API_BASE_URL}/api/items${params ? `?${params}` : ''}`;
@@ -161,7 +233,6 @@ export async function fetchFeaturedProducts(): Promise<ApiProduct[]> {
   }
 }
 
-
 // Helper function to get auth token from storage
 function getAuthToken(): string | null {
   return localStorage.getItem('accessToken') || localStorage.getItem('token');
@@ -181,13 +252,14 @@ function createAuthHeaders(): HeadersInit {
   return headers;
 }
 
-
 export async function getUser(): Promise<UserResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/users/me`, {
       method: 'GET',
       headers: createAuthHeaders(),
     });
+
+    await handleApiResponse(response);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -203,7 +275,6 @@ export async function getUser(): Promise<UserResponse> {
   }
 }
 
-
 export async function updateUser(data: UpdateUserData): Promise<UserResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/users/me`, {
@@ -211,6 +282,8 @@ export async function updateUser(data: UpdateUserData): Promise<UserResponse> {
       headers: createAuthHeaders(),
       body: JSON.stringify(data),
     });
+
+    await handleApiResponse(response);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -226,7 +299,6 @@ export async function updateUser(data: UpdateUserData): Promise<UserResponse> {
   }
 }
 
-
 export async function changePassword(
   data: ChangePasswordData
 ): Promise<ChangePasswordResponse> {
@@ -240,6 +312,8 @@ export async function changePassword(
       }),
     });
 
+    await handleApiResponse(response);
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(
@@ -250,6 +324,60 @@ export async function changePassword(
     return await response.json();
   } catch (error) {
     console.error('Error changing password:', error);
+    throw error;
+  }
+}
+
+export async function sendSupportContact(
+  data: SupportContactRequest
+): Promise<SupportContactResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/support/contact`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.message || `Failed to send contact: ${response.statusText}`
+      );
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Error sending support contact:", error);
+    throw error;
+  }
+}
+
+export async function sendSupportChatMessage(
+  data: SupportChatRequest
+): Promise<SupportChatResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/support/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.message || `Failed to send chat message: ${response.statusText}`
+      );
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Error sending support chat message:", error);
     throw error;
   }
 }
@@ -325,6 +453,8 @@ export async function createPayment(
       body: JSON.stringify(data),
     });
 
+    await handleApiResponse(response);
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(
@@ -335,6 +465,430 @@ export async function createPayment(
     return await response.json();
   } catch (error) {
     console.error('Error creating payment:', error);
+    throw error;
+  }
+}
+
+// Order interfaces
+export interface CreateCodOrderRequest {
+  items: Array<{
+    productId: number;
+    quantity: number;
+    color?: string;
+    size?: string;
+  }>;
+  shippingInfo: {
+    customerName: string;
+    phone?: string;
+    address: string;
+  };
+}
+
+export interface CreateCodOrderResponse {
+  success: boolean;
+  message: string;
+  data: {
+    orderId: number;
+    orderNumber: string;
+    amount: number;
+    status: string;
+  };
+}
+
+export interface OrderItem {
+  id: number;
+  productId: number;
+  slug: string,
+  productName: string;
+  quantity: number;
+  price: string;
+  color?: string;
+  size?: string;
+  image?: string;
+}
+
+export interface OrderEvent {
+  id: number;
+  status: string;
+  description?: string;
+  createdAt: string;
+}
+
+export interface Order {
+  id: number;
+  orderNumber: string;
+  userId: number;
+  customerName: string;
+  shippingAddress: string;
+  trackingNumber?: string;
+  totalAmount: string;
+  status: string;
+  items: OrderItem[];
+  timeline: OrderEvent[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Reviews
+export interface Review {
+  id: number;
+  rating: number;
+  comment: string | null;
+  userId: number;
+  productId: number;
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    id: number;
+    name: string | null;
+  };
+}
+
+export interface ProductReviewsResponse {
+  reviews: Review[];
+  averageRating: number;
+  totalReviews: number;
+}
+
+export interface GetOrdersResponse {
+  success: boolean;
+  data: Order[];
+}
+
+export interface GetOrderResponse {
+  success: boolean;
+  data: Order;
+}
+
+export async function getProductReviews(
+  productId: number
+): Promise<ProductReviewsResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/reviews/product/${productId}`);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch product reviews: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function createReview(
+  productId: number,
+  data: { userId: number; rating: number; comment?: string }
+): Promise<Review> {
+  const response = await fetch(`${API_BASE_URL}/api/reviews/${productId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || 'Failed to submit review');
+  }
+
+  // Backend returns { message, data }
+  return result.data as Review;
+}
+
+/**
+ * Tạo đơn hàng với phương thức COD
+ * @param data - Thông tin đơn hàng và địa chỉ giao hàng
+ * @returns Thông tin đơn hàng đã tạo
+ */
+export async function createCodOrder(
+  data: CreateCodOrderRequest
+): Promise<CreateCodOrderResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/payments/create-cod`, {
+      method: 'POST',
+      headers: createAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Failed to create COD order: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating COD order:', error);
+    throw error;
+  }
+}
+
+/**
+ * Lấy danh sách đơn hàng của user
+ * @returns Danh sách đơn hàng
+ */
+export async function getOrders(): Promise<GetOrdersResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/orders`, {
+      method: 'GET',
+      headers: createAuthHeaders(),
+    });
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Failed to fetch orders: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    throw error;
+  }
+}
+
+/**
+ * Lấy chi tiết đơn hàng theo ID
+ * @param orderId - ID của đơn hàng
+ * @returns Chi tiết đơn hàng
+ */
+export async function getOrderById(orderId: number): Promise<GetOrderResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
+      method: 'GET',
+      headers: createAuthHeaders(),
+    });
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Failed to fetch order: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    throw error;
+  }
+}
+
+// Notification interfaces
+export interface Notification {
+  id: number;
+  userId: number;
+  type: string;
+  action: string;
+  orderId?: number;
+  orderNumber?: string;
+  read: boolean;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
+}
+
+export interface GetNotificationsResponse {
+  success: boolean;
+  message: string;
+  data: Notification[];
+  count: number;
+}
+
+export interface MarkAsReadResponse {
+  success: boolean;
+  message: string;
+  data?: Notification;
+}
+
+export interface UnreadCountResponse {
+  success: boolean;
+  count: number;
+}
+
+/**
+ * Lấy danh sách thông báo
+ * @param filters - Bộ lọc (type, read status)
+ * @returns Danh sách thông báo
+ */
+export async function getNotifications(filters?: {
+  type?: string;
+  read?: boolean;
+}): Promise<GetNotificationsResponse> {
+  try {
+    const params = new URLSearchParams();
+    if (filters?.type) {
+      params.append("type", filters.type);
+    }
+    if (filters?.read !== undefined) {
+      params.append("read", filters.read.toString());
+    }
+
+    const url = `${API_BASE_URL}/api/notifications${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: createAuthHeaders(),
+    });
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message ||
+          `Failed to fetch notifications: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    throw error;
+  }
+}
+
+/**
+ * Đánh dấu thông báo là đã đọc
+ * @param notificationId - ID thông báo
+ * @returns Thông báo đã cập nhật
+ */
+export async function markNotificationAsRead(
+  notificationId: number
+): Promise<MarkAsReadResponse> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/notifications/${notificationId}/read`,
+      {
+        method: "PUT",
+        headers: createAuthHeaders(),
+      }
+    );
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message ||
+          `Failed to mark notification as read: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+    throw error;
+  }
+}
+
+/**
+ * Đánh dấu tất cả thông báo là đã đọc
+ * @returns Số lượng thông báo đã cập nhật
+ */
+export async function markAllNotificationsAsRead(): Promise<{
+  success: boolean;
+  message: string;
+  count: number;
+}> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/notifications/read-all`,
+      {
+        method: "PUT",
+        headers: createAuthHeaders(),
+      }
+    );
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message ||
+          `Failed to mark all notifications as read: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error marking all notifications as read:", error);
+    throw error;
+  }
+}
+
+/**
+ * Xóa thông báo
+ * @param notificationId - ID thông báo
+ */
+export async function deleteNotification(
+  notificationId: number
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/notifications/${notificationId}`,
+      {
+        method: "DELETE",
+        headers: createAuthHeaders(),
+      }
+    );
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message ||
+          `Failed to delete notification: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error deleting notification:", error);
+    throw error;
+  }
+}
+
+/**
+ * Lấy số lượng thông báo chưa đọc
+ * @returns Số lượng thông báo chưa đọc
+ */
+export async function getUnreadNotificationCount(): Promise<UnreadCountResponse> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/notifications/unread-count`,
+      {
+        method: "GET",
+        headers: createAuthHeaders(),
+      }
+    );
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message ||
+          `Failed to get unread count: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error getting unread count:", error);
     throw error;
   }
 }

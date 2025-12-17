@@ -6,6 +6,8 @@ import { Minus, Plus, RefreshCcw, Star, Truck } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
+import type { Review } from "@/services/api";
+import { createReview, getProductReviews } from "@/services/api";
 type ProductImage = {
   id: number;
   url: string;
@@ -23,6 +25,12 @@ function ProductDetailPage() {
   const { slug } = useParams();
   const [productDetail, setProductDetail] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [reviewRating, setReviewRating] = useState(5);
+  const [submittingReview, setSubmittingReview] = useState(false);
   const { addToCart } = useCart();
 
   useEffect(() => {
@@ -51,6 +59,23 @@ function ProductDetailPage() {
     }
   }, [slug]);
 
+  useEffect(() => {
+    const loadReviews = async () => {
+      if (!productDetail?.id) return;
+      try {
+        const data = await getProductReviews(productDetail.id);
+        console.log("review", data);
+        setReviews(data.reviews);
+        setAverageRating(data.averageRating || 0);
+        setTotalReviews(data.totalReviews || 0);
+      } catch (error) {
+        console.error("Failed to load reviews", error);
+      }
+    };
+
+    loadReviews();
+  }, [productDetail?.id]);
+
   const handleQuantityChange = (direction: "increment" | "decrement") => {
     setQuantity((current) => {
       const nextValue = direction === "increment" ? current + 1 : current - 1;
@@ -74,6 +99,49 @@ function ProductDetailPage() {
     toast.success("Added to cart!", {
       description: `${productDetail.name} (${quantity}x) has been added to your cart.`,
     });
+  };
+
+  const handleSubmitReview = async () => {
+    if (!productDetail?.id) return;
+
+    const userIdStr = localStorage.getItem("userId");
+    if (!userIdStr) {
+      toast.error("You need to login to leave a review.");
+      return;
+    }
+
+    const userId = parseInt(userIdStr, 10);
+    if (!userId) {
+      toast.error("Invalid user. Please login again.");
+      return;
+    }
+
+    if (!reviewText.trim()) {
+      toast.error("Please enter your review.");
+      return;
+    }
+
+    setSubmittingReview(true);
+    try {
+      const newReview = await createReview(productDetail.id, {
+        userId,
+        rating: reviewRating,
+        comment: reviewText.trim(),
+      });
+
+      const nextReviews = [newReview, ...reviews];
+      setReviews(nextReviews);
+      setTotalReviews(nextReviews.length);
+      const sum = nextReviews.reduce((acc, r) => acc + r.rating, 0);
+      setAverageRating(sum / nextReviews.length);
+      setReviewText("");
+      toast.success("Review submitted successfully.");
+    } catch (error: any) {
+      console.error("Failed to submit review", error);
+      toast.error(error?.message || "Failed to submit review.");
+    } finally {
+      setSubmittingReview(false);
+    }
   };
   if (loading) return <div>Loading...</div>;
   if (!productDetail) return <div>Product not found</div>;
@@ -151,6 +219,26 @@ function ProductDetailPage() {
                 <p className="text-4xl font-semibold text-slate-900">
                   ${productDetail?.price}
                 </p>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <Star
+                          key={index}
+                          className={cn(
+                            "h-4 w-4",
+                            index < Math.round(averageRating)
+                              ? "text-yellow-500 fill-yellow-500"
+                              : "text-slate-300"
+                          )}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-slate-600">
+                      {averageRating.toFixed(1)} / 5 ({totalReviews} reviews)
+                    </span>
+                  </div>
+                </div>
               </div>
               <p className="max-w-xl text-base leading-relaxed text-slate-600">
                 {productDetail.description}
@@ -210,6 +298,67 @@ function ProductDetailPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="reviews" className="mt-10">
+          <div className="space-y-4 rounded-3xl border border-slate-100 bg-slate-50 p-6 sm:p-7">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+              <h2 className="text-xl font-semibold text-slate-900">
+                Customer Reviews
+              </h2>
+              <p className="text-sm text-slate-600">
+                {totalReviews} review{totalReviews !== 1 ? "s" : ""} ·{" "}
+                <span className="font-medium">
+                  {averageRating.toFixed(1)} / 5
+                </span>
+              </p>
+            </div>
+
+            {/* List comments */}
+            <div className="space-y-3 max-h-[260px] overflow-y-auto pr-1">
+              {reviews.length === 0 ? (
+                <p className="text-sm text-slate-500 text-center my-8">
+                  No reviews yet. Be the first to review this product.
+                </p>
+              ) : (
+                reviews.map((review) => (
+                  <div
+                    key={review.id}
+                    className="rounded-2xl border border-slate-100 bg-white p-4"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-slate-900">
+                          {review.user?.name || "Anonymous"}
+                        </span>
+                        <span className="text-xs text-slate-400">
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                          <Star
+                            key={index}
+                            className={cn(
+                              "h-4 w-4",
+                              index < review.rating
+                                ? "text-yellow-500 fill-yellow-500"
+                                : "text-slate-300"
+                            )}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    {review.comment && (
+                      <p className="mt-2 text-sm text-slate-700">
+                        {review.comment}
+                      </p>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
