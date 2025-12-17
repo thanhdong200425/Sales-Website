@@ -28,9 +28,6 @@ import { handleLogout } from "@/services/api";
 
 const NAV_LINKS = [
   { label: "Shop", to: "/products", isDropdown: true },
-  { label: "On Sale", to: "/pipeline" },
-  { label: "New Arrivals", to: "/new-arrivals" },
-  { label: "Brands", to: "/brands" },
   { label: "Support", to: "/support" },
 ];
 
