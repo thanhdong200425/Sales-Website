@@ -679,3 +679,216 @@ export async function getOrderById(orderId: number): Promise<GetOrderResponse> {
     throw error;
   }
 }
+
+// Notification interfaces
+export interface Notification {
+  id: number;
+  userId: number;
+  type: string;
+  action: string;
+  orderId?: number;
+  orderNumber?: string;
+  read: boolean;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
+}
+
+export interface GetNotificationsResponse {
+  success: boolean;
+  message: string;
+  data: Notification[];
+  count: number;
+}
+
+export interface MarkAsReadResponse {
+  success: boolean;
+  message: string;
+  data?: Notification;
+}
+
+export interface UnreadCountResponse {
+  success: boolean;
+  count: number;
+}
+
+/**
+ * Lấy danh sách thông báo
+ * @param filters - Bộ lọc (type, read status)
+ * @returns Danh sách thông báo
+ */
+export async function getNotifications(filters?: {
+  type?: string;
+  read?: boolean;
+}): Promise<GetNotificationsResponse> {
+  try {
+    const params = new URLSearchParams();
+    if (filters?.type) {
+      params.append("type", filters.type);
+    }
+    if (filters?.read !== undefined) {
+      params.append("read", filters.read.toString());
+    }
+
+    const url = `${API_BASE_URL}/api/notifications${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: createAuthHeaders(),
+    });
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message ||
+          `Failed to fetch notifications: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    throw error;
+  }
+}
+
+/**
+ * Đánh dấu thông báo là đã đọc
+ * @param notificationId - ID thông báo
+ * @returns Thông báo đã cập nhật
+ */
+export async function markNotificationAsRead(
+  notificationId: number
+): Promise<MarkAsReadResponse> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/notifications/${notificationId}/read`,
+      {
+        method: "PUT",
+        headers: createAuthHeaders(),
+      }
+    );
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message ||
+          `Failed to mark notification as read: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+    throw error;
+  }
+}
+
+/**
+ * Đánh dấu tất cả thông báo là đã đọc
+ * @returns Số lượng thông báo đã cập nhật
+ */
+export async function markAllNotificationsAsRead(): Promise<{
+  success: boolean;
+  message: string;
+  count: number;
+}> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/notifications/read-all`,
+      {
+        method: "PUT",
+        headers: createAuthHeaders(),
+      }
+    );
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message ||
+          `Failed to mark all notifications as read: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error marking all notifications as read:", error);
+    throw error;
+  }
+}
+
+/**
+ * Xóa thông báo
+ * @param notificationId - ID thông báo
+ */
+export async function deleteNotification(
+  notificationId: number
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/notifications/${notificationId}`,
+      {
+        method: "DELETE",
+        headers: createAuthHeaders(),
+      }
+    );
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message ||
+          `Failed to delete notification: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error deleting notification:", error);
+    throw error;
+  }
+}
+
+/**
+ * Lấy số lượng thông báo chưa đọc
+ * @returns Số lượng thông báo chưa đọc
+ */
+export async function getUnreadNotificationCount(): Promise<UnreadCountResponse> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/notifications/unread-count`,
+      {
+        method: "GET",
+        headers: createAuthHeaders(),
+      }
+    );
+
+    await handleApiResponse(response);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message ||
+          `Failed to get unread count: ${response.statusText}`
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error getting unread count:", error);
+    throw error;
+  }
+}

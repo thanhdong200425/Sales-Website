@@ -83,6 +83,42 @@ export async function getVendorProfile() {
   return data;
 }
 
+export async function forgotPasswordVendor(email: string) {
+  const response = await fetch(`${API_BASE_URL}/forgot-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to send reset email");
+  }
+
+  return data;
+}
+
+export async function resetPasswordVendor(token: string, newPassword: string) {
+  const response = await fetch(`${API_BASE_URL}/reset-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ token, newPassword }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to reset password");
+  }
+
+  return data;
+}
+
 // Dashboard APIs
 export async function getVendorStats() {
   const response = await fetch(`${API_BASE_URL}/dashboard/stats`, {
@@ -227,6 +263,59 @@ export async function getVendorOrdersList(
 
   if (!response.ok) {
     throw new Error(data.message || "Failed to get orders");
+  }
+
+  return data;
+}
+
+export async function getVendorOrderDetail(orderId: number) {
+  const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+    method: "GET",
+    headers: createVendorAuthHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to get order detail");
+  }
+
+  return data;
+}
+
+export async function updateOrderItemStatus(
+  orderItemId: number,
+  status: string,
+  trackingNumber?: string
+) {
+  const response = await fetch(
+    `${API_BASE_URL}/orders/items/${orderItemId}/status`,
+    {
+      method: "PUT",
+      headers: createVendorAuthHeaders(),
+      body: JSON.stringify({ status, trackingNumber }),
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update order status");
+  }
+
+  return data;
+}
+
+export async function getVendorOrderStats() {
+  const response = await fetch(`${API_BASE_URL}/orders/stats`, {
+    method: "GET",
+    headers: createVendorAuthHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to get order stats");
   }
 
   return data;

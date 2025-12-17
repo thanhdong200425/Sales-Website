@@ -29,12 +29,16 @@ import {
 import { VendorLayout } from "./components/vendor/VendorLayout.tsx";
 import VendorLoginPage from "./pages/vendor/VendorLoginPage.tsx";
 import VendorRegisterPage from "./pages/vendor/VendorRegisterPage.tsx";
+import VendorForgotPasswordPage from "./pages/vendor/VendorForgotPasswordPage.tsx";
+import VendorResetPasswordPage from "./pages/vendor/VendorResetPasswordPage.tsx";
 import VendorDashboardPage from "./pages/vendor/VendorDashboardPage.tsx";
 import SalesAnalyticsPage from "./pages/vendor/SalesAnalyticsPage.tsx";
 import { OrderHistoryPage } from "./pages/OrderHistoryPage.tsx";
 import VendorProductList from "./pages/vendor/VendorProductListPage.tsx";
 import VendorCreateProductPage from "./pages/vendor/VendorCreateProductPage.tsx";
 import VendorEditProductPage from "./pages/vendor/VendorEditProductPage.tsx";
+import VendorOrderManagementPage from "./pages/vendor/VendorOrderManagementPage.tsx";
+import { Toaster } from "./components/ui/sonner.tsx";
 
 const router = createBrowserRouter([
   {
@@ -157,15 +161,51 @@ const router = createBrowserRouter([
           </ProtectedVendorRoute>
         ),
       },
+      {
+        path: "orders",
+        element: (
+          <ProtectedVendorRoute>
+            <VendorOrderManagementPage />
+          </ProtectedVendorRoute>
+        ),
+      },
     ],
   },
   {
     path: "/vendor/login",
-    element: <VendorLoginPage />,
+    element: (
+      <>
+        <VendorLoginPage />
+        <Toaster position="top-right" richColors />
+      </>
+    ),
   },
   {
     path: "/vendor/register",
-    element: <VendorRegisterPage />,
+    element: (
+      <>
+        <VendorRegisterPage />
+        <Toaster position="top-right" richColors />
+      </>
+    ),
+  },
+  {
+    path: "/vendor/forgot-password",
+    element: (
+      <>
+        <VendorForgotPasswordPage />
+        <Toaster position="top-right" richColors />
+      </>
+    ),
+  },
+  {
+    path: "/vendor/reset-password",
+    element: (
+      <>
+        <VendorResetPasswordPage />
+        <Toaster position="top-right" richColors />
+      </>
+    ),
   },
   {
     path: "*",

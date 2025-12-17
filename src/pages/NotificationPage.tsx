@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -7,111 +7,94 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  getNotifications,
+  markNotificationAsRead,
+  type Notification as ApiNotification,
+} from '@/services/api';
 
-interface Notification {
-  id: string;
-  type: 'order' | 'message' | 'alert';
-  userId: string;
+interface Notification extends ApiNotification {
+  timestamp: string;
   userName: string;
   avatar: string;
-  action: string;
-  orderId: string;
-  orderNumber: string;
-  timestamp: string;
-  read: boolean;
 }
 
-const NOTIFICATIONS: Notification[] = [
-  {
-    id: '1',
-    type: 'order',
-    userId: '1',
-    userName: 'Jonathon Smith',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
-    action: 'Place an order',
-    orderId: '#254845',
-    orderNumber: '254845',
-    timestamp: '9 hours ago',
-    read: false,
-  },
-  {
-    id: '2',
-    type: 'order',
-    userId: '2',
-    userName: 'Emily Davis',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
-    action: 'Place an order',
-    orderId: '#478541',
-    orderNumber: '478541',
-    timestamp: '9 hours ago',
-    read: true,
-  },
-  {
-    id: '3',
-    type: 'order',
-    userId: '3',
-    userName: 'Michael Brown',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop',
-    action: 'Place an order',
-    orderId: '#2644B',
-    orderNumber: '2644B',
-    timestamp: '9 hours ago',
-    read: true,
-  },
-  {
-    id: '4',
-    type: 'order',
-    userId: '1',
-    userName: 'Jonathon Smith',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
-    action: 'Place an order',
-    orderId: '#254845',
-    orderNumber: '254845',
-    timestamp: '9 hours ago',
-    read: false,
-  },
-  {
-    id: '5',
-    type: 'order',
-    userId: '1',
-    userName: 'Jonathon Smith',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
-    action: 'Place an order',
-    orderId: '#254845',
-    orderNumber: '254845',
-    timestamp: '9 hours ago',
-    read: true,
-  },
-  {
-    id: '6',
-    type: 'order',
-    userId: '1',
-    userName: 'Jonathon Smith',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
-    action: 'Place an order',
-    orderId: '#254845',
-    orderNumber: '254845',
-    timestamp: '9 hours ago',
-    read: true,
-  },
-];
+const formatTimeAgo = (date: string): string => {
+  const now = new Date();
+  const past = new Date(date);
+  const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return 'just now';
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+  return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
+};
 
 export default function NotificationPage() {
-  const [notifications, setNotifications] = useState<Notification[]>(NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [selectDropdown, setSelectDropdown] = useState('all');
   const [filterDropdown, setFilterDropdown] = useState('all');
+  const [loading, setLoading] = useState(true);
 
-  const groupedNotifications = {
-    today: notifications.slice(0, 3),
-    yesterday: notifications.slice(3),
+  useEffect(() => {
+    loadNotifications();
+  }, [selectDropdown, filterDropdown]);
+
+  const loadNotifications = async () => {
+    try {
+      setLoading(true);
+      const filters: any = {};
+
+      if (filterDropdown !== 'all') {
+        filters.type = filterDropdown;
+      }
+
+      if (selectDropdown === 'read') {
+        filters.read = true;
+      } else if (selectDropdown === 'unread') {
+        filters.read = false;
+      }
+
+      const response = await getNotifications(filters);
+
+      const transformedNotifications = response.data.map((notif) => ({
+        ...notif,
+        timestamp: formatTimeAgo(notif.createdAt),
+        userName: notif.user.name || 'Unknown User',
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(notif.user.name || 'U')}&background=random`,
+      }));
+
+      setNotifications(transformedNotifications);
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleMarkAsRead = (id: string) => {
-    setNotifications(
-      notifications.map((notif) =>
-        notif.id === id ? { ...notif, read: true } : notif
-      )
-    );
+  const groupedNotifications = {
+    today: notifications.filter((n) => {
+      const diffInHours = (new Date().getTime() - new Date(n.createdAt).getTime()) / (1000 * 60 * 60);
+      return diffInHours < 24;
+    }),
+    yesterday: notifications.filter((n) => {
+      const diffInHours = (new Date().getTime() - new Date(n.createdAt).getTime()) / (1000 * 60 * 60);
+      return diffInHours >= 24;
+    }),
+  };
+
+  const handleMarkAsRead = async (id: number) => {
+    try {
+      await markNotificationAsRead(id);
+      setNotifications(
+        notifications.map((notif) =>
+          notif.id === id ? { ...notif, read: true } : notif
+        )
+      );
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
   };
 
   return (
@@ -162,17 +145,33 @@ export default function NotificationPage() {
               <DropdownMenuItem onClick={() => setFilterDropdown('all')}>
                 All
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterDropdown('orders')}>
+              <DropdownMenuItem onClick={() => setFilterDropdown('order')}>
                 Orders
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterDropdown('messages')}>
+              <DropdownMenuItem onClick={() => setFilterDropdown('message')}>
                 Messages
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className='text-center py-12'>
+            <div className='inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600'></div>
+            <p className='mt-4 text-slate-600'>Loading notifications...</p>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && notifications.length === 0 && (
+          <div className='text-center py-12'>
+            <p className='text-slate-600'>No notifications found.</p>
+          </div>
+        )}
+
         {/* Notifications List */}
+        {!loading && notifications.length > 0 && (
         <div className='space-y-6'>
           {/* Today Section */}
           {groupedNotifications.today.length > 0 && (
@@ -214,9 +213,11 @@ export default function NotificationPage() {
                         <span className='text-slate-600'>
                           {notification.action}
                         </span>
-                        <span className='font-semibold text-indigo-600'>
-                          {notification.orderId}
-                        </span>
+                        {notification.orderNumber && (
+                          <span className='font-semibold text-indigo-600'>
+                            #{notification.orderNumber}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -290,9 +291,11 @@ export default function NotificationPage() {
                         <span className='text-slate-600'>
                           {notification.action}
                         </span>
-                        <span className='font-semibold text-indigo-600'>
-                          {notification.orderId}
-                        </span>
+                        {notification.orderNumber && (
+                          <span className='font-semibold text-indigo-600'>
+                            #{notification.orderNumber}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -326,6 +329,7 @@ export default function NotificationPage() {
             </div>
           )}
         </div>
+        )}
       </div>
     </div>
   );
