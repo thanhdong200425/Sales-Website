@@ -36,6 +36,7 @@ import { OrderHistoryPage } from "./pages/OrderHistoryPage.tsx";
 import VendorProductList from "./pages/vendor/VendorProductListPage.tsx";
 import VendorCreateProductPage from "./pages/vendor/VendorCreateProductPage.tsx";
 import VendorEditProductPage from "./pages/vendor/VendorEditProductPage.tsx";
+import VendorOrderManagementPage from "./pages/vendor/VendorOrderManagementPage.tsx";
 import { Toaster } from "./components/ui/sonner.tsx";
 
 const router = createBrowserRouter([
@@ -152,6 +153,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedVendorRoute>
             <VendorEditProductPage />
+          </ProtectedVendorRoute>
+        ),
+      },
+      {
+        path: "orders",
+        element: (
+          <ProtectedVendorRoute>
+            <VendorOrderManagementPage />
           </ProtectedVendorRoute>
         ),
       },
