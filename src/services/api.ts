@@ -71,12 +71,18 @@ export interface ProductsResponse {
 export interface ProductFilters {
   style?: string;
   brand?: string;
-  minPrice?: string;
-  maxPrice?: string;
+  minPrice?: string | number;
+  maxPrice?: string | number;
+  inStock?: boolean;
   color?: string;
   size?: string;
   type?: string;
   page?: number;
+  search?: string;
+  sort?: string;
+  limit?: number;
+  category?: string;
+  rating?: number;
 }
 // User interfaces
 export interface User {
@@ -201,22 +207,58 @@ export async function getProductDetailById(id: number): Promise<ApiProduct> {
   return (await response.json()) as ApiProduct;
 }
 
-
 export async function fetchProducts(
   filters: ProductFilters = {}
 ): Promise<ProductsResponse> {
   try {
-    const params = new URLSearchParams(filters as Record<string, string>).toString();
-    const url = `${API_BASE_URL}/api/items${params ? `?${params}` : ''}`;
+    const params = new URLSearchParams();
+
+    if (filters.page) params.append("page", filters.page.toString());
+    if (filters.limit) params.append("limit", filters.limit.toString());
+
+    if (filters.search && filters.search !== "undefined") {
+        params.append("q", filters.search);
+    }
+
+    if (filters.category && filters.category !== "undefined") {
+        params.append("category", filters.category);
+    }
+
+    if (filters.minPrice !== undefined && filters.minPrice !== null && filters.minPrice !== "") {
+        params.append("min", filters.minPrice.toString());
+    }
+    if (filters.maxPrice !== undefined && filters.maxPrice !== null && filters.maxPrice !== "") {
+        params.append("max", filters.maxPrice.toString());
+    }
+
+    if (filters.sort && filters.sort !== "undefined") {
+        params.append("sort", filters.sort);
+    }
+
+    if (filters.inStock) {
+        params.append("stock", "true");
+    }
+
+    if (filters.rating) {
+        params.append("rating", filters.rating.toString());
+    }
+    
+    if (filters.color) params.append("color", filters.color);
+    if (filters.style) params.append("style", filters.style);
+    const url = `${API_BASE_URL}/api/vendor/products/public/search?${params.toString()}`;
+    
+    console.log("Fetching URL:", url); 
 
     const response = await fetch(url);
+    
     if (!response.ok) {
-      throw new Error(`Failed to fetch products: ${response.statusText}`);
+      const errorText = await response.text(); 
+      throw new Error(`Failed to fetch products: ${response.status} - ${errorText}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error("Error fetching products:", error);
     throw error;
   }
 }
